@@ -13,7 +13,7 @@ ENV JAR_FILE_PATH="http://192.168.33.10:8081/repository/maven-snapshots/tn/espri
 
 # Download the JAR file from Nexus. The -o flag specifies the output file name
 # Make sure the JAR path is correct and that it exists in Nexus
-ADD "${NEXUS_URL}${JAR_FILE_PATH}" devops_project.jar
+ADD "${NEXUS_URL}/${JAR_FILE_PATH}" devops_project.jar
 
 # Command to run the Spring Boot application using the downloaded JAR
 ENTRYPOINT ["java", "-jar", "devops_project.jar"]
