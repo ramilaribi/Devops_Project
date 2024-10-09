@@ -1,9 +1,6 @@
 # Use OpenJDK 17 as the base image
 FROM openjdk:17
 
-# Install wget without creating a local cache => keep the image size smal
-RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
-
 # Expose port 8082 for the application to allow external access
 EXPOSE 8082
 
@@ -14,7 +11,7 @@ ENV NEXUS_URL="http://192.168.33.10:8081"
 ENV JAR_FILE_PATH="repository/maven-snapshots/tn/esprit/voltix/0.0.1-SNAPSHOT/voltix-0.0.1-20241008.163153-1.jar"
 
 # Download the JAR file from Nexus using wget
-RUN wget "${NEXUS_URL}/${JAR_FILE_PATH}" -O devops_project.jar
+RUN curl -o devops_project.jar "${NEXUS_URL}${JAR_FILE_PATH}"
 
 # Command to run the Spring Boot application using the downloaded JAR
 ENTRYPOINT ["java", "-jar", "devops_project.jar"]
