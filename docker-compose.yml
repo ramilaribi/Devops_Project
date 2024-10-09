@@ -12,10 +12,13 @@ services:
       JWT_SECRET: s3cr3tK3y1234567890
       SPRING_APPLICATION_NAME: Backend_Voltix
     depends_on:
-      - db
-      - mongo
+      db:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
     networks:
       - voltix-network
+    restart: unless-stopped
 
   db:
     image: mysql:8.0
@@ -27,6 +30,12 @@ services:
       - "3307:3306"
     networks:
       - voltix-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mongo:
     image: mongo:latest
@@ -35,6 +44,12 @@ services:
       - "27017:27017"
     networks:
       - voltix-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   voltix-network:
