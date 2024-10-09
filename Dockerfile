@@ -1,6 +1,9 @@
 # Use OpenJDK 17 as the base image
 FROM openjdk:17
 
+# Install wget without creating a local cache => keep the image size smal
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
 # Expose port 8082 for the application to allow external access
 EXPOSE 8082
 
