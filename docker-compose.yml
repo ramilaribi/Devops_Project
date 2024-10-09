@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    image: ramilaribi/devops
+    container_name: voltix-backend
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/voltixxx?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/voltix_mongo_db
+      JWT_SECRET: s3cr3tK3y1234567890
+      SPRING_APPLICATION_NAME: Backend_Voltix
+    depends_on:
+      - db
+      - mongo
+    networks:
+      - voltix-network
+
+  db:
+    image: mysql:8.0
+    container_name: voltix-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: voltixxx
+    ports:
+      - "3306:3306"
+    networks:
+      - voltix-network
+
+  mongo:
+    image: mongo:latest
+    container_name: voltix-mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - voltix-network
+
+networks:
+  voltix-network:
+    driver: bridge
