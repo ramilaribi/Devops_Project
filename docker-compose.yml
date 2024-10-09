@@ -38,7 +38,7 @@ services:
       retries: 3
 
   mongo:
-    image: mongo:latest
+    image: mongo:4.4
     container_name: voltix-mongo
     ports:
       - "27017:27017"
