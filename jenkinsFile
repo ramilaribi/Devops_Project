@@ -31,6 +31,13 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         }
+       stage('Check SonarQube Connectivity') {
+           steps {
+               script {
+                   sh 'curl -f http://192.168.33.10:9000/api/system/status'
+               }
+           }
+       }
         stage('MVN SONARQUBE') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'sonar-credentials', passwordVariable: 'SONAR_PASSWORD', usernameVariable: 'SONAR_USERNAME')]) {
