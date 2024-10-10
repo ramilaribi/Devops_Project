@@ -1,0 +1,89 @@
+pipeline {
+    agent any
+    stages {
+        stage("Testing Maven") {
+            steps {
+                sh "mvn -version"
+            }
+        }
+        stage("Testing JDK") {
+            steps {
+                sh "java -version"
+            }
+        }
+        stage("Checkout Git") {
+            steps {
+                echo "Pulling"
+            }
+        }
+        stage('MVN COMPILE') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('Generate JaCoCo Coverage Report') {
+            steps {
+                sh 'mvn jacoco:report'
+            }
+        }
+        stage('MVN SONARQUBE') {
+            steps {
+                // Use the credentials stored in Jenkins for SonarQube
+                withCredentials([usernamePassword(credentialsId: 'sonar-credentials', passwordVariable: 'SONAR_PASSWORD', usernameVariable: 'SONAR_USERNAME')]) {
+                    sh "mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD"
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                // Use the credentials stored in Jenkins for Nexus
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
+                    sh "mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://localhost:8081/repository/maven-releases/ -Dusername=$NEXUS_USERNAME -Dpassword=$NEXUS_PASSWORD"
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    def customImageName = "imagerami"
+                    sh "docker build -t $customImageName ."
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Use the credentials stored in Jenkins for Docker
+                    withCredentials([usernamePassword(credentialsId: 'docker-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
+                        sh 'docker tag imagerami ramilaribi/imagerami'
+                        sh 'docker push ramilaribi/imagerami'
+                    }
+                }
+            }
+        }
+        stage('Verify Docker Compose Installation') {
+            steps {
+                sh 'docker compose version'
+            }
+        }
+        stage('Docker Compose') {
+            steps {
+                sh 'docker compose down'
+                sh 'docker compose up -d --build'
+            }
+        }
+        stage('check Docker Compose') {
+            steps {
+                script {
+                    sh 'docker compose ps'
+                }
+            }
+        }
+    }
+}
