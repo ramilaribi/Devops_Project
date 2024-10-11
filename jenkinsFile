@@ -50,11 +50,9 @@ pipeline {
                 }
             }
         }
-            stages {
-                stage('Check Nexus Connectivity') {
+              stage('Check Nexus Connectivity') {
                     steps {
                         script {
-                            // Check if Nexus repository is reachable
                             sh 'curl -f http://192.168.33.10:8081/repository/maven-releases/ || echo "Nexus is not reachable"'
                         }
                     }
