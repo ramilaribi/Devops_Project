@@ -53,7 +53,6 @@ pipeline {
               stage('Check Nexus Connectivity') {
                     steps {
                         script {
-                            // Check if Nexus repository is reachable
                             sh 'curl -f http://192.168.33.10:8081/repository/maven-releases/ || echo "Nexus is not reachable"'
                         }
                     }
@@ -116,46 +115,50 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            echo 'Cleaning up...'
-            sh 'docker compose down'
-        }
-        success {
-            emailext(
-                to: 'laribi.rami@esprit.tn',
-                subject: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-Hello,
+      post {
+          always {
+              echo 'Cleaning up...'
+              sh 'docker compose down'
+          }
+          success {
+              withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
+                  emailext(
+                      to: "${EMAIL_USERNAME}",
+                      subject: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                      body: """
+  Hello,
 
-The build for job '${env.JOB_NAME}' (Build #${env.BUILD_NUMBER}) has completed successfully.
+  The build for job '${env.JOB_NAME}' (Build #${env.BUILD_NUMBER}) has completed successfully.
 
-You can check the console output for more details at: [Build Log](${env.BUILD_URL})
+  You can check the console output for more details at: [Build Log](${env.BUILD_URL})
 
-Thank you for your attention!
+  Thank you for your attention!
 
-Best regards,
-Your Jenkins CI/CD
-"""
-            )
-        }
-        failure {
-            emailext(
-                to: 'laribi.rami@esprit.tn',
-                subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-Hello,
+  Best regards,
+  Your Jenkins CI/CD
+  """
+                  )
+              }
+          }
+          failure {
+              withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
+                  emailext(
+                      to: "${EMAIL_USERNAME}",
+                      subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                      body: """
+  Hello,
 
-The build for job '${env.JOB_NAME}' (Build #${env.BUILD_NUMBER}) has failed.
+  The build for job '${env.JOB_NAME}' (Build #${env.BUILD_NUMBER}) has failed.
 
-You can check the console output for more details at: [Build Log](${env.BUILD_URL})
+  You can check the console output for more details at: [Build Log](${env.BUILD_URL})
 
-Please investigate the issue.
+  Please investigate the issue.
 
-Best regards,
-Your Jenkins CI/CD
-"""
-            )
-        }
-    }
-}
+  Best regards,
+  Your Jenkins CI/CD
+  """
+                  )
+              }
+          }
+      }
+  }
