@@ -50,13 +50,18 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
-                    sh "mvn deploy -DskipTests -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/ -Dusername=$NEXUS_USERNAME -Dpassword=$NEXUS_PASSWORD"
-                }
-            }
-        }
+      stage('Deploy') {
+          steps {
+              withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
+                  sh """
+                      mvn deploy -DskipTests \
+                      -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/ \
+                      -Dusername=${NEXUS_USERNAME} \
+                      -Dpassword=${NEXUS_PASSWORD}
+                  """
+              }
+          }
+      }
         stage('Build Docker Image') {
             steps {
                 script {
