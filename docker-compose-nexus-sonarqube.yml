@@ -30,7 +30,7 @@ services:
 
   db:
     image: mysql:5.7
-    container_name: sonarqube-db
+    container_name: sonarqube-db-auto
     ports:
       - "3306:3306"
     environment:
