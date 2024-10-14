@@ -19,17 +19,14 @@ services:
       - sonarqube-extensions:/opt/sonarqube/extensions
       - sonarqube-bundled-plugins:/opt/sonarqube/lib/bundled-plugins
     environment:
-      - SONAR_JDBC_URL=jdbc:mysql://db:3306/sonar
+      - SONAR_JDBC_URL=jdbc:mysql://sonarqube-db-auto:3306/sonar
       - SONAR_JDBC_USERNAME=sonar
       - SONAR_JDBC_PASSWORD=sonar
-      - SONAR_WEB_JDBC_URL=jdbc:mysql://db:3306/sonar
-      - SONAR_WEB_JDBC_USERNAME=sonar
-      - SONAR_WEB_JDBC_PASSWORD=sonar
     restart: unless-stopped
     depends_on:
-      - db
+      - sonarqube-db
 
-  db:
+  sonarqube-db:
     image: mysql:5.7
     container_name: sonarqube-db-auto
     ports:
@@ -39,7 +36,7 @@ services:
       MYSQL_USER: sonar
       MYSQL_PASSWORD: sonar
       MYSQL_ROOT_PASSWORD: root_password
-      restart: unless-stopped
+    restart: unless-stopped
     volumes:
       - mysql-data:/var/lib/mysql
 
