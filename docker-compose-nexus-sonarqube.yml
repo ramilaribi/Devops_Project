@@ -25,6 +25,7 @@ services:
       - SONAR_WEB_JDBC_URL=jdbc:mysql://db:3306/sonar
       - SONAR_WEB_JDBC_USERNAME=sonar
       - SONAR_WEB_JDBC_PASSWORD=sonar
+    restart: unless-stopped
     depends_on:
       - db
 
@@ -38,6 +39,7 @@ services:
       MYSQL_USER: sonar
       MYSQL_PASSWORD: sonar
       MYSQL_ROOT_PASSWORD: root_password
+      restart: unless-stopped
     volumes:
       - mysql-data:/var/lib/mysql
 
