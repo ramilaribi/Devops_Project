@@ -31,6 +31,16 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         }
+         stage('Start Nexus and SonarQube') {
+                    steps {
+                        script {
+                            // Start Nexus and SonarQube services
+                            sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
+                            // Optional: Wait for services to be ready (You can adjust the sleep time if needed)
+                            sleep(30) // Wait for Nexus and SonarQube to initialize
+                        }
+                    }
+                }
        stage('Check SonarQube Connectivity') {
            steps {
                script {
