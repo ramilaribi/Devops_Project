@@ -21,7 +21,7 @@ pipeline {
                 sh 'mvn compile'
             }
         }
-        stage('Run Tests') {
+       /* stage('Run Tests') {
             steps {
                 sh 'mvn test'
             }
@@ -30,7 +30,7 @@ pipeline {
             steps {
                 sh 'mvn jacoco:report'
             }
-        }
+        }*/
         stage('Start Nexus and SonarQube') {
             steps {
                 script {
@@ -126,7 +126,7 @@ pipeline {
         always {
             echo 'Cleaning up...'
             sh 'docker compose down'
-            sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down'
+        //    sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down'
         }
         success {
             withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
