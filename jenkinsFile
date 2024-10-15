@@ -41,16 +41,18 @@ pipeline {
                         }
                     }
                 }
-        stage('Check SonarQube Connectivity') {
-                   steps {
-                       timeout(time: 3, unit: 'MINUTES') {
-                           waitUntil {
-                               def response = sh(script: 'curl -s http://192.168.33.10:9000/api/system/status', returnStdout: true).trim()
-                               return response.contains('"status":"UP"')
-                           }
-                       }
-                   }
-               }
+          stage('Check SonarQube Connectivity') {
+                 steps {
+                     script {
+                         timeout(time: 3, unit: 'MINUTES') {
+                             waitUntil {
+                                 def response = sh(script: 'curl -s http://192.168.33.10:9000/api/system/status', returnStdout: true).trim()
+                                 return response.contains('"status":"UP"')
+                             }
+                         }
+                     }
+                 }
+             }
         stage('MVN SONARQUBE') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'sonar-credentials', passwordVariable: 'SONAR_PASSWORD', usernameVariable: 'SONAR_USERNAME')]) {
