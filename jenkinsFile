@@ -31,26 +31,26 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         }
-        stage('Start Nexus and SonarQube') {
-            steps {
-                script {
-                    // Start Nexus and SonarQube services
-                    sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
-                    // Optional: Wait for services to be ready (You can adjust the sleep time if needed)
-                    sleep(30) // Wait for Nexus and SonarQube to initialize
-                }
-            }
-        }
-        stage('Check SonarQube Connectivity') {
-            steps {
-                timeout(time: 3, unit: 'MINUTES') {
-                    waitUntil {
-                        def response = sh(script: 'curl -s http://192.168.33.10:9000/api/system/status', returnStdout: true).trim()
-                        return response.contains('"status":"UP"')
+         stage('Start Nexus and SonarQube') {
+                    steps {
+                        script {
+                            // Start Nexus and SonarQube services
+                            sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
+                            // Optional: Wait for services to be ready (You can adjust the sleep time if needed)
+                            sleep(30) // Wait for Nexus and SonarQube to initialize
+                        }
                     }
                 }
-            }
-        }
+        stage('Check SonarQube Connectivity') {
+                   steps {
+                       timeout(time: 3, unit: 'MINUTES') {
+                           waitUntil {
+                               def response = sh(script: 'curl -s http://192.168.33.10:9000/api/system/status', returnStdout: true).trim()
+                               return response.contains('"status":"UP"')
+                           }
+                       }
+                   }
+               }
         stage('MVN SONARQUBE') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'sonar-credentials', passwordVariable: 'SONAR_PASSWORD', usernameVariable: 'SONAR_USERNAME')]) {
@@ -63,33 +63,33 @@ pipeline {
                 }
             }
         }
-        stage('Check Nexus Connectivity') {
-            steps {
-                script {
-                    sh 'curl -f http://192.168.33.10:8081/repository/maven-releases/ || echo "Nexus is not reachable"'
+              stage('Check Nexus Connectivity') {
+                    steps {
+                        script {
+                            sh 'curl -f http://192.168.33.10:8081/repository/maven-releases/ || echo "Nexus is not reachable"'
+                        }
+                    }
                 }
-            }
-        }
-        stage('Deploy') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
-                    sh """
-                        echo "<settings>
-                            <servers>
-                                <server>
-                                    <id>deploymentRepo</id>
-                                    <username>${NEXUS_USERNAME}</username>
-                                    <password>${NEXUS_PASSWORD}</password>
-                                </server>
-                            </servers>
-                        </settings>" > ~/.m2/settings.xml
+  stage('Deploy') {
+      steps {
+          withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
+              sh """
+                  echo "<settings>
+                      <servers>
+                          <server>
+                              <id>deploymentRepo</id>
+                              <username>${NEXUS_USERNAME}</username>
+                              <password>${NEXUS_PASSWORD}</password>
+                          </server>
+                      </servers>
+                  </settings>" > ~/.m2/settings.xml
 
-                        mvn deploy -DskipTests \
-                        -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/
-                    """
-                }
-            }
-        }
+                  mvn deploy -DskipTests \
+                  -DaltDeploymentRepository=deploymentRepo::default::http://192.168.33.10:8081/repository/maven-releases/
+              """
+          }
+      }
+  }
         stage('Build Docker Image') {
             steps {
                 script {
@@ -128,17 +128,50 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            echo 'Cleaning up...'
-            sh 'docker compose down'
-        }
-        success {
-            withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
-                emailext(
-                    to: "${EMAIL_USERNAME}",
-                    subject: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: """
-Hello,
+      post {
+          always {
+              echo 'Cleaning up...'
+              sh 'docker compose down'
+          }
+          success {
+              withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
+                  emailext(
+                      to: "${EMAIL_USERNAME}",
+                      subject: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                      body: """
+  Hello,
 
-The build for job '${env.JOB_NAME}' (Build #${env.BUILD_NUMBER})
+  The build for job '${env.JOB_NAME}' (Build #${env.BUILD_NUMBER}) has completed successfully.
+
+  You can check the console output for more details at: [Build Log](${env.BUILD_URL})
+
+  Thank you for your attention!
+
+  Best regards,
+  Your Jenkins CI/CD
+  """
+                  )
+              }
+          }
+          failure {
+              withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
+                  emailext(
+                      to: "${EMAIL_USERNAME}",
+                      subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                      body: """
+  Hello,
+
+  The build for job '${env.JOB_NAME}' (Build #${env.BUILD_NUMBER}) has failed.
+
+  You can check the console output for more details at: [Build Log](${env.BUILD_URL})
+
+  Please investigate the issue.
+
+  Best regards,
+  Your Jenkins CI/CD
+  """
+                  )
+              }
+          }
+      }
+  }
