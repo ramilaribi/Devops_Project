@@ -8,6 +8,8 @@ services:
       - nexus-data:/nexus-data
     environment:
       - NEXUS_SECURITY_RANDOMPASSWORD=false
+    networks:
+      - my_network
 
   sonarqube:
     image: sonarqube
@@ -22,9 +24,12 @@ services:
       - SONAR_JDBC_URL=jdbc:postgresql://sonarqube-db-auto:5432/sonar
       - SONAR_JDBC_USERNAME=sonar
       - SONAR_JDBC_PASSWORD=sonar
+      - SONAR_JAVA_OPTS=-Xmx512m -Xms128m
     restart: unless-stopped
     depends_on:
       - sonarqube-db
+    networks:
+      - my_network
 
   sonarqube-db:
     image: postgres:13
@@ -38,6 +43,13 @@ services:
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - my_network
 
 volumes:
   nexus-data:
@@ -45,3 +57,7 @@ volumes:
   sonarqube-extensions:
   sonarqube-bundled-plugins:
   postgres-data:
+
+networks:
+  my_network:
+    driver: bridge
