@@ -53,12 +53,13 @@ pipeline {
              }
         stage('MVN SONARQUBE') {
             steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                sh '''
-                mvn sonar:sonar -X \
-                    -Dsonar.login=$SONAR_TOKEN \
-                    -Dsonar.host.url=http://192.168.33.10:9000
-                '''
+                withCredentials([usernamePassword(credentialsId: 'sonar-credentials', passwordVariable: 'SONAR_PASSWORD', usernameVariable: 'SONAR_USERNAME')]) {
+                    sh '''
+                    mvn sonar:sonar -X \
+                        -Dsonar.login=$SONAR_USERNAME \
+                        -Dsonar.password=$SONAR_PASSWORD \
+                        -Dsonar.host.url=http://192.168.33.10:9000
+                    '''
                 }
             }
         }
