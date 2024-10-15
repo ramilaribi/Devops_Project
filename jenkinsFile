@@ -53,7 +53,7 @@ pipeline {
              }
         stage('MVN SONARQUBE') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'sonar-credentials', passwordVariable: 'SONAR_PASSWORD', usernameVariable: 'SONAR_USERNAME')]) {
+                withCredentials([usernamePassword(credentialsId:'sonar-token', variable: 'SONAR_TOKEN')]){
                     sh '''
                     mvn sonar:sonar \
                       -Dsonar.login=$SONAR_TOKEN \
