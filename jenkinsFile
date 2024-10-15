@@ -35,7 +35,7 @@ pipeline {
                     steps {
                         script {
                             sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
-                            sleep(120)
+                            sleep(180)
                         }
                     }
                 }
@@ -62,6 +62,7 @@ pipeline {
               }
           }
       }
+
   stage('Deploy') {
       steps {
           withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
