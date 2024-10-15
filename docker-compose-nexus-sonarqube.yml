@@ -19,7 +19,7 @@ services:
       - sonarqube-extensions:/opt/sonarqube/extensions
       - sonarqube-bundled-plugins:/opt/sonarqube/lib/bundled-plugins
     environment:
-      - SONAR_JDBC_URL=jdbc:mysql://sonarqube-db-auto:3306/sonar
+      - SONAR_JDBC_URL=jdbc:postgresql://sonarqube-db-auto:5432/sonar
       - SONAR_JDBC_USERNAME=sonar
       - SONAR_JDBC_PASSWORD=sonar
     restart: unless-stopped
@@ -27,22 +27,21 @@ services:
       - sonarqube-db
 
   sonarqube-db:
-    image: mysql:5.7
+    image: postgres:13
     container_name: sonarqube-db-auto
     ports:
-      - "3308:3306"
+      - "5432:5432"
     environment:
-      MYSQL_DATABASE: sonar
-      MYSQL_USER: sonar
-      MYSQL_PASSWORD: sonar
-      MYSQL_ROOT_PASSWORD: root_password
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
     restart: unless-stopped
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
 
 volumes:
   nexus-data:
   sonarqube-data:
   sonarqube-extensions:
   sonarqube-bundled-plugins:
-  mysql-data:
+  postgres-data:
