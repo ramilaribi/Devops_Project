@@ -65,18 +65,6 @@ pipeline {
                 }
             }
         }
-         stage('Check Nexus Connectivity') {
-              steps {
-                  script {
-                      timeout(time: 5, unit: 'MINUTES') { // Set a timeout for the Nexus check
-                          waitUntil {
-                              def response = sh(script: 'curl -s http://192.168.33.10:8081/service/rest/v1/status', returnStdout: true).trim()
-                              return response.contains('"status":"UP"')
-                          }
-                      }
-                  }
-              }
-          }
   stage('Deploy') {
       steps {
           withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
