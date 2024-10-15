@@ -37,7 +37,7 @@ pipeline {
                             // Start Nexus and SonarQube services
                             sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
                             // Optional: Wait for services to be ready (You can adjust the sleep time if needed)
-                            sleep(30) // Wait for Nexus and SonarQube to initialize
+                            sleep(120) // Wait for Nexus and SonarQube to initialize
                         }
                     }
                 }
@@ -71,7 +71,7 @@ pipeline {
                       timeout(time: 5, unit: 'MINUTES') { // Set a timeout for the Nexus check
                           waitUntil {
                               def response = sh(script: 'curl -s http://192.168.33.10:8081/service/rest/v1/status', returnStdout: true).trim()
-                              return response.contains('"status":"STARTING"')
+                              return response.contains('"status":"UP"')
                           }
                       }
                   }
