@@ -44,7 +44,7 @@ pipeline {
           stage('Check SonarQube Connectivity') {
                  steps {
                      script {
-                         timeout(time: 3, unit: 'MINUTES') {
+                         timeout(time: 5, unit: 'MINUTES') {
                              waitUntil {
                                  def response = sh(script: 'curl -s http://192.168.33.10:9000/api/system/status', returnStdout: true).trim()
                                  return response.contains('"status":"UP"')
@@ -68,7 +68,7 @@ pipeline {
          stage('Check Nexus Connectivity') {
               steps {
                   script {
-                      timeout(time: 3, unit: 'MINUTES') { // Set a timeout for the Nexus check
+                      timeout(time: 5, unit: 'MINUTES') { // Set a timeout for the Nexus check
                           waitUntil {
                               def response = sh(script: 'curl -s http://192.168.33.10:8081/service/rest/v1/status', returnStdout: true).trim()
                               return response.contains('"status":"UP"')
@@ -139,7 +139,7 @@ pipeline {
           always {
               echo 'Cleaning up...'
               sh 'docker compose down'
-              sh ' docker-compose docker-compose-nexus-sonarqube.yml down'
+              sh ' docker-compose -f docker-compose-nexus-sonarqube.yml down'
           }
           success {
               withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
