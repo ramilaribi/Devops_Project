@@ -35,10 +35,22 @@ pipeline {
                     steps {
                         script {
                             sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
-                            sleep(150)
+                            sleep(120)
                         }
                     }
                 }
+          stage('Check SonarQube Connectivity') {
+                 steps {
+                     script {
+                         timeout(time: 5, unit: 'MINUTES') {
+                             waitUntil {
+                                 def response = sh(script: 'curl -s http://192.168.33.10:9000/api/system/status', returnStdout: true).trim()
+                                 return response.contains('"status":"UP"')
+                             }
+                         }
+                     }
+                 }
+             }
         stage('MVN SONARQUBE') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'sonar-credentials', passwordVariable: 'SONAR_PASSWORD', usernameVariable: 'SONAR_USERNAME')]) {
