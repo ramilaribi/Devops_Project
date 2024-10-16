@@ -5,7 +5,9 @@ def startContainerIfExists(containerName) {
         sh "docker start ${containerName}"
     } else {
         echo "${containerName} container does not exist."
+        return false // Indicate that the container does not exist
     }
+    return true // Indicate that the container was started
 }
 
 pipeline {
@@ -52,17 +54,29 @@ pipeline {
                     def sonarqubeContainer = "sonarqube_auto"
                     def sonarqubeDbContainer = "sonarqube-db-auto"
 
+                    // Initialize a variable to track if we need to create new containers
+                    def containersNeedCreating = false
+
                     // Start Nexus container if it exists
-                    startContainerIfExists(nexusContainer)
+                    if (!startContainerIfExists(nexusContainer)) {
+                        containersNeedCreating = true
+                    }
 
                     // Start SonarQube container if it exists
-                    startContainerIfExists(sonarqubeContainer)
+                    if (!startContainerIfExists(sonarqubeContainer)) {
+                        containersNeedCreating = true
+                    }
 
                     // Start SonarQube DB container if it exists
-                    startContainerIfExists(sonarqubeDbContainer)
+                    if (!startContainerIfExists(sonarqubeDbContainer)) {
+                        containersNeedCreating = true
+                    }
 
-                    // Optionally, bring up any containers that are defined in the compose file, in case of a fresh start
-                    sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --no-start'
+                    // Bring up any containers that are defined in the compose file, if needed
+                    if (containersNeedCreating) {
+                        sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --no-start'
+                        echo "Containers created using Docker Compose."
+                    }
 
                     // Give time for Nexus and SonarQube to initialize
                     sleep(120)
@@ -154,7 +168,6 @@ pipeline {
         always {
             echo 'Cleaning up...'
             sh 'docker compose down'
-            // sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down'
         }
         success {
             withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
