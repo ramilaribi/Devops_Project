@@ -31,11 +31,6 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         } */
-        stage('Set Elasticsearch Max Map Count') {
-            steps {
-                sh 'sudo sysctl -w vm.max_map_count=262144'
-            }
-        }
         stage('Check and Start Nexus and SonarQube') {
             steps {
                 script {
