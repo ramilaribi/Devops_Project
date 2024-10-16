@@ -30,10 +30,31 @@ pipeline {
             steps {
                 sh 'mvn jacoco:report'
             }
-        }*/
-        stage('Start Nexus and SonarQube') {
+        } */
+        stage('Check and Start Nexus and SonarQube') {
             steps {
                 script {
+                    // Check if nexus_auto container exists
+                    if (sh(script: "docker ps -q -f name=nexus_auto", returnStatus: true) == 0) {
+                        echo "Nexus container is already running. Stopping it..."
+                        sh 'docker stop nexus_auto'
+                        sh 'docker rm nexus_auto'
+                    }
+
+                    // Check if sonarqube_auto container exists
+                    if (sh(script: "docker ps -q -f name=sonarqube_auto", returnStatus: true) == 0) {
+                        echo "SonarQube container is already running. Stopping it..."
+                        sh 'docker stop sonarqube_auto'
+                        sh 'docker rm sonarqube_auto'
+                    }
+
+                    // Check if sonarqube-db-auto container exists
+                    if (sh(script: "docker ps -q -f name=sonarqube-db-auto", returnStatus: true) == 0) {
+                        echo "SonarQube DB container is already running. Stopping it..."
+                        sh 'docker stop sonarqube-db-auto'
+                        sh 'docker rm sonarqube-db-auto'
+                    }
+
                     // Clean up any previous containers before starting new ones
                     sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down || true'
                     sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
