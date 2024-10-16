@@ -33,11 +33,11 @@ pipeline {
                 sh 'mvn compile'
             }
         }
-   stage('Run Tests') {
-       steps {
-           sh 'mvn clean test -X'
-       }
-   }
+        stage('Run Tests') {
+            steps {
+                sh 'mvn clean test -X'
+            }
+        }
         stage('Generate JaCoCo Coverage Report') {
             steps {
                 sh 'mvn jacoco:report'
@@ -75,24 +75,23 @@ pipeline {
                     } else {
                         echo "All containers are already running."
                     }
-                    echo " Wait for services to be ready"
+                    echo "Wait for services to be ready"
                     sleep(180)
                 }
             }
         }
-
-   stage('MVN SONARQUBE') {
-       steps {
-           withCredentials([usernamePassword(credentialsId: 'sonar-credentials', passwordVariable: 'SONAR_PASSWORD', usernameVariable: 'SONAR_USERNAME')]) {
-               sh '''
-               mvn sonar:sonar \
-               -Dsonar.host.url=http://192.168.33.10:9000 \
-               -Dsonar.login=$SONAR_USERNAME \
-               -Dsonar.password=$SONAR_PASSWORD
-               '''
-           }
-       }
-   }
+        stage('MVN SONARQUBE') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'sonar-credentials', passwordVariable: 'SONAR_PASSWORD', usernameVariable: 'SONAR_USERNAME')]) {
+                    sh '''
+                    mvn sonar:sonar \
+                    -Dsonar.host.url=http://192.168.33.10:9000 \
+                    -Dsonar.login=$SONAR_USERNAME \
+                    -Dsonar.password=$SONAR_PASSWORD
+                    '''
+                }
+            }
+        }
         stage('Deploy') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASSWORD', usernameVariable: 'NEXUS_USERNAME')]) {
@@ -154,11 +153,11 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            sh 'docker stop nexus_auto'
-            sh 'docker stop sonarqube_auto'
-            sh 'docker stop sonarqube-db-auto'
-            sh 'docker compose down'
-            sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down'
+            sh 'docker stop nexus_auto || true'
+            sh 'docker stop sonarqube_auto || true'
+            sh 'docker stop sonarqube-db-auto || true'
+            sh 'docker compose down || true'
+            sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down || true'
         }
         success {
             withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
