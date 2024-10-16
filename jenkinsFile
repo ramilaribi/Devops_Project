@@ -52,28 +52,35 @@ pipeline {
 
                     def containersNeedCreating = false
 
+                    // Check if Nexus container exists
                     if (!startContainerIfExists(nexusContainer)) {
                         containersNeedCreating = true
                     }
 
+                    // Check if SonarQube container exists
                     if (!startContainerIfExists(sonarqubeContainer)) {
                         containersNeedCreating = true
                     }
 
+                    // Check if SonarQube DB container exists
                     if (!startContainerIfExists(sonarqubeDbContainer)) {
                         containersNeedCreating = true
                     }
 
+                    // If any container is missing, create and start all using Docker Compose
                     if (containersNeedCreating) {
-                        sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --no-start'
-                        echo "Containers created using Docker Compose."
+                        echo "Creating and starting containers using Docker Compose..."
+                        sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
+                        echo "Containers created and started."
+                    } else {
+                        echo "All containers are already running."
                     }
-
+                    echo " Wait for services to be ready"
                     sleep(180)
-
                 }
             }
         }
+
    stage('MVN SONARQUBE') {
        steps {
            withCredentials([usernamePassword(credentialsId: 'sonar-credentials', passwordVariable: 'SONAR_PASSWORD', usernameVariable: 'SONAR_USERNAME')]) {
