@@ -168,6 +168,7 @@ pipeline {
         always {
             echo 'Cleaning up...'
             sh 'docker compose down'
+            sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down'
         }
         success {
             withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
