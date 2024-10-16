@@ -1,3 +1,13 @@
+def startContainerIfExists(containerName) {
+    def containerExists = sh(script: "docker ps -a -q -f name=${containerName}", returnStatus: true) == 0
+    if (containerExists) {
+        echo "${containerName} container exists. Starting it..."
+        sh "docker start ${containerName}"
+    } else {
+        echo "${containerName} container does not exist."
+    }
+}
+
 pipeline {
     agent any
     stages {
@@ -21,7 +31,9 @@ pipeline {
                 sh 'mvn compile'
             }
         }
-       /* stage('Run Tests') {
+        // Uncomment these if you want to run tests and generate reports
+        /*
+        stage('Run Tests') {
             steps {
                 sh 'mvn test'
             }
@@ -31,37 +43,7 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         }
-        stage('Check and Start Nexus and SonarQube') {
-            steps {
-                script {
-                    // Check if nexus_auto container exists
-                    if (sh(script: "docker ps -q -f name=nexus_auto", returnStatus: true) == 0) {
-                        echo "Nexus container is already running. Stopping it..."
-                        sh 'docker stop nexus_auto'
-                        sh 'docker rm nexus_auto'
-                    }
-
-                    // Check if sonarqube_auto container exists
-                    if (sh(script: "docker ps -q -f name=sonarqube_auto", returnStatus: true) == 0) {
-                        echo "SonarQube container is already running. Stopping it..."
-                        sh 'docker stop sonarqube_auto'
-                        sh 'docker rm sonarqube_auto'
-                    }
-
-                    // Check if sonarqube-db-auto container exists
-                    if (sh(script: "docker ps -q -f name=sonarqube-db-auto", returnStatus: true) == 0) {
-                        echo "SonarQube DB container is already running. Stopping it..."
-                        sh 'docker stop sonarqube-db-auto'
-                        sh 'docker rm sonarqube-db-auto'
-                    }
-
-                    // Clean up any previous containers before starting new ones
-                    sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down || true'
-                    sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
-                    sleep(180)  // Give time for Nexus and SonarQube to initialize
-                }
-            }
-        }*/
+        */
         stage('Check and Start Nexus and SonarQube') {
             steps {
                 script {
@@ -69,17 +51,6 @@ pipeline {
                     def nexusContainer = "nexus_auto"
                     def sonarqubeContainer = "sonarqube_auto"
                     def sonarqubeDbContainer = "sonarqube-db-auto"
-
-                    // Function to start a container if it exists
-                    def startContainerIfExists(containerName) {
-                        def containerExists = sh(script: "docker ps -a -q -f name=${containerName}", returnStatus: true) == 0
-                        if (containerExists) {
-                            echo "${containerName} container exists. Starting it..."
-                            sh "docker start ${containerName}"
-                        } else {
-                            echo "${containerName} container does not exist."
-                        }
-                    }
 
                     // Start Nexus container if it exists
                     startContainerIfExists(nexusContainer)
@@ -183,7 +154,7 @@ pipeline {
         always {
             echo 'Cleaning up...'
             sh 'docker compose down'
-        //    sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down'
+            // sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down'
         }
         success {
             withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
