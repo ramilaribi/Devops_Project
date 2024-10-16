@@ -8,7 +8,7 @@
     </parent>
     <groupId>tn.esprit</groupId>
     <artifactId>voltix</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>voltix</name>
     <description>voltix</description>
     <properties>
