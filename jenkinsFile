@@ -33,11 +33,11 @@ pipeline {
                 sh 'mvn compile'
             }
         }
-       stage('Run Tests') {
-            steps {
-                sh 'mvn test'
-            }
-        }
+   stage('Run Tests') {
+       steps {
+           sh 'mvn clean test -X'
+       }
+   }
         stage('Generate JaCoCo Coverage Report') {
             steps {
                 sh 'mvn jacoco:report'
