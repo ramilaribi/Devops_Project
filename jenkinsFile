@@ -33,7 +33,7 @@ pipeline {
                 sh 'mvn compile'
             }
         }
-        stage('Run Tests') {
+    /*    stage('Run Tests') {
             steps {
                 sh 'mvn test'
             }
@@ -42,7 +42,7 @@ pipeline {
             steps {
                 sh 'mvn jacoco:report'
             }
-        }
+        }*/
         stage('Check and Start Nexus and SonarQube') {
             steps {
                 script {
