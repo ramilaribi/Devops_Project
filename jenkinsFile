@@ -5,9 +5,9 @@ def startContainerIfExists(containerName) {
         sh "docker start ${containerName}"
     } else {
         echo "${containerName} container does not exist."
-        return false // Indicate that the container does not exist
+        return false
     }
-    return true // Indicate that the container was started
+    return true
 }
 
 pipeline {
@@ -33,8 +33,6 @@ pipeline {
                 sh 'mvn compile'
             }
         }
-        // Uncomment these if you want to run tests and generate reports
-        /*
         stage('Run Tests') {
             steps {
                 sh 'mvn test'
@@ -45,56 +43,36 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         }
-        */
         stage('Check and Start Nexus and SonarQube') {
             steps {
                 script {
-                    // Define the names of the containers
                     def nexusContainer = "nexus_auto"
                     def sonarqubeContainer = "sonarqube_auto"
                     def sonarqubeDbContainer = "sonarqube-db-auto"
 
-                    // Initialize a variable to track if we need to create new containers
                     def containersNeedCreating = false
 
-                    // Start Nexus container if it exists
                     if (!startContainerIfExists(nexusContainer)) {
                         containersNeedCreating = true
                     }
 
-                    // Start SonarQube container if it exists
                     if (!startContainerIfExists(sonarqubeContainer)) {
                         containersNeedCreating = true
                     }
 
-                    // Start SonarQube DB container if it exists
                     if (!startContainerIfExists(sonarqubeDbContainer)) {
                         containersNeedCreating = true
                     }
 
-                    // Bring up any containers that are defined in the compose file, if needed
                     if (containersNeedCreating) {
                         sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --no-start'
                         echo "Containers created using Docker Compose."
                     }
 
-                    // Give time for Nexus and SonarQube to initialize
                     sleep(120)
                 }
             }
         }
-      /*  stage('Check SonarQube Connectivity') {
-            steps {
-                script {
-                    timeout(time: 5, unit: 'MINUTES') {
-                        waitUntil {
-                            def response = sh(script: 'curl -s http://192.168.33.10:9000/api/system/status', returnStdout: true).trim()
-                            return response.contains('"status":"UP"')
-                        }
-                    }
-                }
-            }
-        }*/
         stage('MVN SONARQUBE') {
             steps {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
