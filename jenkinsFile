@@ -30,7 +30,7 @@ pipeline {
             steps {
                 sh 'mvn jacoco:report'
             }
-        } */
+        }
         stage('Check and Start Nexus and SonarQube') {
             steps {
                 script {
@@ -59,6 +59,42 @@ pipeline {
                     sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down || true'
                     sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
                     sleep(180)  // Give time for Nexus and SonarQube to initialize
+                }
+            }
+        }*/
+        stage('Check and Start Nexus and SonarQube') {
+            steps {
+                script {
+                    // Define the names of the containers
+                    def nexusContainer = "nexus_auto"
+                    def sonarqubeContainer = "sonarqube_auto"
+                    def sonarqubeDbContainer = "sonarqube-db-auto"
+
+                    // Function to start a container if it exists
+                    def startContainerIfExists(containerName) {
+                        def containerExists = sh(script: "docker ps -a -q -f name=${containerName}", returnStatus: true) == 0
+                        if (containerExists) {
+                            echo "${containerName} container exists. Starting it..."
+                            sh "docker start ${containerName}"
+                        } else {
+                            echo "${containerName} container does not exist."
+                        }
+                    }
+
+                    // Start Nexus container if it exists
+                    startContainerIfExists(nexusContainer)
+
+                    // Start SonarQube container if it exists
+                    startContainerIfExists(sonarqubeContainer)
+
+                    // Start SonarQube DB container if it exists
+                    startContainerIfExists(sonarqubeDbContainer)
+
+                    // Optionally, bring up any containers that are defined in the compose file, in case of a fresh start
+                    sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --no-start'
+
+                    // Give time for Nexus and SonarQube to initialize
+                    sleep(120)
                 }
             }
         }
