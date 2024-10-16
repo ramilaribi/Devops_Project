@@ -146,10 +146,10 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            sh 'docker compose down'
             sh 'docker stop nexus_auto'
             sh 'docker stop sonarqube_auto'
             sh 'docker stop sonarqube-db-auto'
+            sh 'docker compose down'
             sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down'
         }
         success {
