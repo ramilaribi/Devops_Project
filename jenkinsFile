@@ -69,7 +69,8 @@ pipeline {
                         echo "Containers created using Docker Compose."
                     }
 
-                    sleep(120)
+                    sleep(180)
+
                 }
             }
         }
