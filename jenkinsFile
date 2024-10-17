@@ -13,7 +13,7 @@ def startContainerIfExists(containerName) {
 
 pipeline {
     agent any
-   /* stages {
+   stages {
         stage("Testing Maven") {
             steps {
                 sh "mvn -version"
@@ -29,7 +29,7 @@ pipeline {
                 echo "Pulling"
             }
         }
-       stage('MVN COMPILE') {
+      /*  stage('MVN COMPILE') {
             steps {
                 sh 'mvn compile'
             }
