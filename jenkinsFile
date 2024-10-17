@@ -29,7 +29,7 @@ pipeline {
                 echo "Pulling"
             }
         }
-    /*    stage('MVN COMPILE') {
+       stage('MVN COMPILE') {
             steps {
                 sh 'mvn compile'
             }
@@ -44,43 +44,6 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         }
-        stage('Check and Start Nexus and SonarQube') {
-            steps {
-                script {
-                    def nexusContainer = "nexus_auto"
-                    def sonarqubeContainer = "sonarqube_auto"
-                    def sonarqubeDbContainer = "sonarqube-db-auto"
-
-                    def containersNeedCreating = false
-
-                    // Check if Nexus container exists
-                    if (!startContainerIfExists(nexusContainer)) {
-                        containersNeedCreating = true
-                    }
-
-                    // Check if SonarQube container exists
-                    if (!startContainerIfExists(sonarqubeContainer)) {
-                        containersNeedCreating = true
-                    }
-
-                    // Check if SonarQube DB container exists
-                    if (!startContainerIfExists(sonarqubeDbContainer)) {
-                        containersNeedCreating = true
-                    }
-
-                    // If any container is missing, create and start all using Docker Compose
-                    if (containersNeedCreating) {
-                        echo "Creating and starting containers using Docker Compose..."
-                        sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
-                        echo "Containers created and started."
-                    } else {
-                        echo "All containers are already running."
-                    }
-                    echo "Wait for services to be ready"
-                    sleep(180)
-                }
-            }
-        }*/
          stage('Check and Start Nexus and SonarQube') {
              steps {
                  script {
