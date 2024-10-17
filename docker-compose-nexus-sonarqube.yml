@@ -1,7 +1,7 @@
 services:
   nexus:
     image: sonatype/nexus3:3.38.1
-    container_name: devops-nexus
+    container_name: nexus_auto
     ports:
       - "8081:8081"
     volumes:
@@ -15,7 +15,7 @@ services:
 
   sonarqube:
     image: sonarqube:9.9.1-community
-    container_name: devops-sonarqube
+    container_name: sonarqube_auto
     ports:
       - "9000:9000"
     volumes:
@@ -37,7 +37,7 @@ services:
 
   sonarqube-db:
     image: postgres:13
-    container_name: devops-sonarqube-db
+    container_name: sonarqube-db-auto
     ports:
       - "5432:5432"
     environment:

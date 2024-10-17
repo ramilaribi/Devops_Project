@@ -47,9 +47,9 @@ pipeline {
          stage('Check and Start Nexus and SonarQube') {
              steps {
                  script {
-                     def nexusContainer = "devops-nexus"
-                     def sonarqubeContainer = "devops-sonarqube"
-                     def sonarqubeDbContainer = "devops-sonarqube-db"
+                     def nexusContainer = "nexus_auto"
+                     def sonarqubeContainer = "sonarqube_auto"
+                     def sonarqubeDbContainer = "sonarqube-db-auto"
 
                      def containersNeedCreating = false
 
