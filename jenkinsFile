@@ -196,7 +196,7 @@ pipeline {
             sh 'docker stop sonarqube_auto || true'
             sh 'docker stop sonarqube-db-auto || true'
             sh 'docker compose down || true'
-            sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down || true'
+       //     sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down || true'
         }
         success {
             withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
