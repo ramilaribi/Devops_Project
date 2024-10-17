@@ -115,13 +115,17 @@ pipeline {
             }
         }
         stage('Build Docker Image') {
-            steps {
-                script {
-                    def customImageName = "imagerami"
-                    sh "docker build -t $customImageName ."
-                }
-            }
-        }
+               steps {
+                   script {
+                       def customImageName = "imagerami"
+                       // Extract the version from the pom.xml
+                       def version = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+
+                       // Build the Docker image, passing the version
+                       sh "docker build --build-arg VERSION=${version} -t $customImageName ."
+                   }
+               }
+           }
         stage('Push Docker Image') {
             steps {
                 script {

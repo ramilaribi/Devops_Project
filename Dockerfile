@@ -6,9 +6,11 @@ EXPOSE 8082
 
 # Set the Nexus URL environment variable
 ENV NEXUS_URL="http://192.168.33.10:8081"
+# Accept a build argument for the version
+ARG VERSION
 
-# Set the path to the JAR file in Nexus. Ensure the JAR_FILE_PATH corresponds to your actual path in the Nexus repository
-ENV JAR_FILE_PATH="/repository/maven-releases/tn/esprit/voltix/0.0.2/voltix-0.0.2.jar"
+# Set the path to the JAR file in Nexus using the version argument
+ENV JAR_FILE_PATH="/repository/maven-releases/tn/esprit/voltix/${VERSION}/voltix-${VERSION}.jar"
 
 # Download the JAR file from Nexus using wget
 RUN curl -o devops_project.jar "${NEXUS_URL}${JAR_FILE_PATH}"
