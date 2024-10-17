@@ -29,7 +29,7 @@ pipeline {
                 echo "Pulling"
             }
         }
-      /*  stage('MVN COMPILE') {
+        stage('MVN COMPILE') {
             steps {
                 sh 'mvn compile'
             }
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 sh 'mvn jacoco:report'
             }
-        }*/
+        }
          stage('Check and Start Nexus and SonarQube') {
              steps {
                  script {
@@ -159,9 +159,9 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-          //  sh 'docker stop nexus_auto || true'
-          //  sh 'docker stop sonarqube_auto || true'
-         //   sh 'docker stop sonarqube-db-auto || true'
+            sh 'docker stop nexus_auto || true'
+            sh 'docker stop sonarqube_auto || true'
+            sh 'docker stop sonarqube-db-auto || true'
             sh 'docker compose down || true'
         }
         success {
