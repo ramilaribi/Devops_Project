@@ -1,7 +1,7 @@
 services:
   backend:
     image: ramilaribi/devops_projet
-    container_name: voltix-backend
+    container_name: devops-backend
     ports:
       - "8086:8086"
     environment:
@@ -22,7 +22,7 @@ services:
 
   db:
     image: mysql:8.0
-    container_name: voltix-mysql
+    container_name: devops-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: voltixxx
@@ -39,7 +39,7 @@ services:
 
   mongo:
     image: mongo:4.4
-    container_name: voltix-mongo
+    container_name: devops-mongo
     ports:
       - "27017:27017"
     networks:

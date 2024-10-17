@@ -13,7 +13,7 @@ def startContainerIfExists(containerName) {
 
 pipeline {
     agent any
-    stages {
+   /* stages {
         stage("Testing Maven") {
             steps {
                 sh "mvn -version"
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 sh 'mvn jacoco:report'
             }
-        }
+        }*/
          stage('Check and Start Nexus and SonarQube') {
              steps {
                  script {
@@ -159,11 +159,10 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            sh 'docker stop nexus_auto || true'
-            sh 'docker stop sonarqube_auto || true'
-            sh 'docker stop sonarqube-db-auto || true'
+          //  sh 'docker stop nexus_auto || true'
+          //  sh 'docker stop sonarqube_auto || true'
+         //   sh 'docker stop sonarqube-db-auto || true'
             sh 'docker compose down || true'
-       //     sh 'docker-compose -f docker-compose-nexus-sonarqube.yml down || true'
         }
         success {
             withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {

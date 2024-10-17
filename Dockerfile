@@ -6,6 +6,7 @@ EXPOSE 8082
 
 # Set the Nexus URL environment variable
 ENV NEXUS_URL="http://192.168.33.10:8081"
+
 # Accept a build argument for the version
 ARG VERSION
 
