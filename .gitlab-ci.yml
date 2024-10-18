@@ -1,11 +1,27 @@
 stages:
-  - test
+  - check
+  - build
 
-test:
-  stage: test
-  image: maven:3.8.6-openjdk-17  # Use a Docker image with Maven and Java
+# Job to check the Java version
+check-java:
+  stage: check
+  image: openjdk:17  # Use an image that includes Java 17
   script:
     - echo "Checking Java version..."
     - java -version  # Check the Java version
-    - echo "Running tests..."
-    - mvn test  # Run Maven tests
+
+# Job to check the Maven version
+check-maven:
+  stage: check
+  image: maven:3.8.6  # Use an image that includes Maven
+  script:
+    - echo "Running Maven version..."
+    - mvn --version  # Check the Maven version
+
+# Job to run Maven build
+run-maven-build:
+  stage: build
+  image: maven:3.8.6  # Ensure this job uses an image with Maven
+  script:
+    - echo "Running Maven build..."
+    - mvn compile  # Run Maven compile
