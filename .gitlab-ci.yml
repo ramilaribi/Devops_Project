@@ -2,26 +2,20 @@ stages:
   - check
   - build
 
-# Job to check the Java version
-check-java:
+# Job to check Java and Maven versions
+check-java-maven:
   stage: check
-  image: openjdk:17  # Use an image that includes Java 17
+  image: maven:3.8.6-openjdk-17-slim  # Use an existing image with Maven and Java 17
   script:
     - echo "Checking Java version..."
-    - java -version  # Check the Java version
-
-# Job to check the Maven version
-check-maven:
-  stage: check
-  image: maven:3.8.6  # Use an image that includes Maven
-  script:
-    - echo "Running Maven version..."
-    - mvn --version  # Check the Maven version
+    - java -version  # Check Java version
+    - echo "Checking Maven version..."
+    - mvn --version  # Check Maven version
 
 # Job to run Maven build
 run-maven-build:
   stage: build
-  image: maven:3.8.6  # Ensure this job uses an image with Maven
+  image: maven:3.8.6-openjdk-17-slim  # Use the same image with Maven and Java
   script:
     - echo "Running Maven build..."
     - mvn compile  # Run Maven compile
