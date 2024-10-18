@@ -159,9 +159,9 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            sh 'docker stop nexus_auto || true'
-            sh 'docker stop sonarqube_auto || true'
-            sh 'docker stop sonarqube-db-auto || true'
+           // sh 'docker stop nexus_auto || true'
+          //  sh 'docker stop sonarqube_auto || true'
+          //  sh 'docker stop sonarqube-db-auto || true'
             sh 'docker compose down || true'
         }
         success {
