@@ -1,0 +1,11 @@
+stages:
+  - test
+
+test:
+  stage: test
+  image: maven:3.8.6-openjdk-17  # Use a Docker image with Maven and Java
+  script:
+    - echo "Checking Java version..."
+    - java -version  # Check the Java version
+    - echo "Running tests..."
+    - mvn test  # Run Maven tests
