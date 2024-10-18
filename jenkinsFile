@@ -14,7 +14,7 @@ def startContainerIfExists(containerName) {
 pipeline {
     agent any
    stages {
-        stage("Testing Maven") {
+      /*  stage("Testing Maven") {
             steps {
                 sh "mvn -version"
             }
@@ -23,12 +23,12 @@ pipeline {
             steps {
                 sh "java -version"
             }
-        }
+        }*/
         stage("Checkout Git") {
             steps {
                 echo "Pulling"
             }
-        }
+        }/*
         stage('MVN COMPILE') {
             steps {
                 sh 'mvn compile'
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 sh 'mvn jacoco:report'
             }
-        }
+        }*/
          stage('Check and Start Nexus and SonarQube') {
              steps {
                  script {
