@@ -1,11 +1,13 @@
 stages:
   - check
   - build
+  - test
+  - report
 
 # Job to check Java and Maven versions
 check-java-maven:
   stage: check
-  image: maven:3.8.3-openjdk-17  # Use an existing image with Maven and Java 17
+  image: maven:3.8.3-openjdk-17
   script:
     - echo "Checking Java version..."
     - java -version  # Check Java version
@@ -18,4 +20,23 @@ run-maven-build:
   image: maven:3.8.3-openjdk-17
   script:
     - echo "Running Maven build..."
-    - mvn compile  # Run Maven compile
+    - mvn compile  # Compile the project
+
+# Job to run Maven tests
+run-maven-tests:
+  stage: test
+  image: maven:3.8.3-openjdk-17
+  script:
+    - echo "Running Maven tests..."
+    - mvn clean test  # Run tests and clean up the previous builds
+
+# Job to generate JaCoCo coverage report
+generate-jacoco-report:
+  stage: report
+  image: maven:3.8.3-openjdk-17
+  script:
+    - echo "Generating JaCoCo coverage report..."
+    - mvn jacoco:report  # Generate JaCoCo coverage report
+  artifacts:
+    paths:
+      - target/site/jacoco  # Store the JaCoCo report as an artifact
