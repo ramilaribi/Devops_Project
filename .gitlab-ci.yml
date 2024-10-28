@@ -33,14 +33,14 @@ stages:
 
 # # Job to generate JaCoCo coverage report
 # generate-jacoco-report:
-  stage: report
-  image: maven:3.8.3-openjdk-17
-  script:
-    - echo "Generating JaCoCo coverage report..."
-    - mvn jacoco:report  # Generate JaCoCo coverage report
-  artifacts:
-    paths:
-      - target/site/jacoco  # Store the JaCoCo report as an artifact
+  # stage: report
+  # image: maven:3.8.3-openjdk-17
+  # script:
+  #   - echo "Generating JaCoCo coverage report..."
+  #   - mvn jacoco:report  # Generate JaCoCo coverage report
+  # artifacts:
+  #   paths:
+  #     - target/site/jacoco  # Store the JaCoCo report as an artifact
 
 sonarqube-analysis:
   stage: sonar
