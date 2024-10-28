@@ -47,7 +47,6 @@ sonarqube-analysis:
   image: maven:3.8.3-openjdk-17
   tags:
     - sonarqube
-  timeout: 30 minutes  # Adjust as needed
   script:
     - echo "Starting SonarQube analysis diagnostics..."
     
