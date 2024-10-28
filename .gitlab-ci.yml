@@ -47,6 +47,6 @@ sonarqube-analysis:
   image: maven:3.8.3-openjdk-17
   script:
     - echo "Running SonarQube analysis..."
-    - mvn  --batch-mode verify sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b -X
+    - mvn verify sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b -X
   only:
     - main
