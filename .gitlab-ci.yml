@@ -44,7 +44,7 @@ stages:
 
 sonarqube-analysis:
   stage: sonar
-  image: maven:3.8.3-openjdk-17
+  # image: maven:3.8.3-openjdk-17
   tags:
     - sonarqube
   timeout: 30 minutes  # Adjust as needed
