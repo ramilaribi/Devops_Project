@@ -9,8 +9,6 @@ stages:
 check-java-maven:
   stage: check
   image: maven:3.8.3-openjdk-17
-  tags:
-    - sonarqube
   script:
     - echo "Checking Java version..."
     - java -version  # Check Java version
@@ -21,8 +19,6 @@ check-java-maven:
 run-maven-build:
   stage: build
   image: maven:3.8.3-openjdk-17
-  tags:
-    - sonarqube
   script:
     - echo "Running Maven build..."
     - mvn compile  # Compile the project
@@ -31,8 +27,6 @@ run-maven-build:
 run-maven-tests:
   stage: test
   image: maven:3.8.3-openjdk-17
-  tags:
-    - sonarqube 
   script:
     - echo "Running Maven tests..."
     - mvn clean test  # Run tests and clean up the previous builds
@@ -41,8 +35,6 @@ run-maven-tests:
 generate-jacoco-report:
   stage: report
   image: maven:3.8.3-openjdk-17
-  tags:
-    - sonarqube  
   script:
     - echo "Generating JaCoCo coverage report..."
     - mvn jacoco:report  # Generate JaCoCo coverage report
