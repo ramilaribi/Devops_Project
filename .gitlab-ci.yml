@@ -42,17 +42,42 @@ generate-jacoco-report:
     paths:
       - target/site/jacoco  # Store the JaCoCo report as an artifact
 
-# Job to run SonarQube analysis
 sonarqube-analysis:
   stage: sonar
   image: maven:3.8.3-openjdk-17
   tags:
     - sonarqube
+  timeout: 30 minutes  # Adjust as needed
   script:
-    - echo "Running SonarQube analysis..."
+    - echo "Starting SonarQube analysis diagnostics..."
+    
+    # Check Java version
+    - echo "Checking Java version..."
+    - java -version || (echo "Java is not installed!" && exit 1)
+
+    # Check Maven version
+    - echo "Checking Maven version..."
+    - mvn --version || (echo "Maven is not installed!" && exit 1)
+
+    # Check SonarQube server availability
+    - echo "Checking SonarQube server availability..."
+    - curl -f http://192.168.33.10:9000 || (echo "SonarQube server is not reachable!" && exit 1)
+
+    # Check SonarQube project key
+    - echo "Checking SonarQube project key configuration..."
     - mvn sonar:sonar \
-      -Dsonar.projectKey=Devpos_Sonar\
-      -Dsonar.host.url=http:192.168.33.10:9000 \
-      -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b
+      -Dsonar.projectKey=Devpos_Sonar \
+      -Dsonar.host.url=http://192.168.33.10:9000 \
+      -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b || (echo "Failed to run SonarQube analysis!" && exit 1)
+
+    # Optionally enable verbose output
+    - echo "Running SonarQube analysis with debug logs..."
+    - mvn sonar:sonar \
+      -Dsonar.projectKey=Devpos_Sonar \
+      -Dsonar.host.url=http://192.168.33.10:9000 \
+      -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b \
+      -X -e || (echo "SonarQube analysis failed!" && exit 1)
+
+    - echo "SonarQube analysis diagnostics completed."
   only:
     - main
