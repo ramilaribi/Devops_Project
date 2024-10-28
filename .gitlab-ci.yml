@@ -1,6 +1,8 @@
 check_sonarqube:
   stage: test
   image: curlimages/curl:latest
+  tags:
+    - sonar
   script:
     - echo "Checking SonarQube server status..."
     - if curl --output /dev/null --silent --head --fail "http://192.168.33.10:9000"; then echo "SonarQube server is reachable."; else echo "SonarQube server is not reachable."; exit 1; fi
