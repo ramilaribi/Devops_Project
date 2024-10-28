@@ -52,7 +52,7 @@ sonarqube-analysis:
     - echo "Running SonarQube analysis..."
     - mvn sonar:sonar \
       -Dsonar.projectKey=Devpos_Sonar\
-      -Dsonar.host.url=http://localhost:9000 \
-      -Dsonar.login=$SONAR_TOKEN
+      -Dsonar.host.url=http:192.168.33.10:9000 \
+      -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b
   only:
     - main
