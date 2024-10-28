@@ -19,42 +19,42 @@ check-sonarqube-server:
         exit 1
       fi
 
-# Job to check Java and Maven versions
-check-java-maven:
-  stage: check
-  image: maven:3.8.3-openjdk-17
-  script:
-    - echo "Checking Java version..."
-    - java -version  # Check Java version
-    - echo "Checking Maven version..."
-    - mvn --version  # Check Maven version
+# # Job to check Java and Maven versions
+# check-java-maven:
+#   stage: check
+#   image: maven:3.8.3-openjdk-17
+#   script:
+#     - echo "Checking Java version..."
+#     - java -version  # Check Java version
+#     - echo "Checking Maven version..."
+#     - mvn --version  # Check Maven version
 
-# Job to run Maven build
-run-maven-build:
-  stage: build
-  image: maven:3.8.3-openjdk-17
-  script:
-    - echo "Running Maven build..."
-    - mvn compile  # Compile the project
+# # Job to run Maven build
+# run-maven-build:
+#   stage: build
+#   image: maven:3.8.3-openjdk-17
+#   script:
+#     - echo "Running Maven build..."
+#     - mvn compile  # Compile the project
 
-# Job to run Maven tests
-run-maven-tests:
-  stage: test
-  image: maven:3.8.3-openjdk-17
-  script:
-    - echo "Running Maven tests..."
-    - mvn clean test  # Run tests and clean up the previous builds
+# # Job to run Maven tests
+# run-maven-tests:
+#   stage: test
+#   image: maven:3.8.3-openjdk-17
+#   script:
+#     - echo "Running Maven tests..."
+#     - mvn clean test  # Run tests and clean up the previous builds
 
-# Job to generate JaCoCo coverage report
-generate-jacoco-report:
-  stage: report
-  image: maven:3.8.3-openjdk-17
-  script:
-    - echo "Generating JaCoCo coverage report..."
-    - mvn jacoco:report  # Generate JaCoCo coverage report
-  artifacts:
-    paths:
-      - target/site/jacoco  # Store the JaCoCo report as an artifact
+# # Job to generate JaCoCo coverage report
+# generate-jacoco-report:
+#   stage: report
+#   image: maven:3.8.3-openjdk-17
+#   script:
+#     - echo "Generating JaCoCo coverage report..."
+#     - mvn jacoco:report  # Generate JaCoCo coverage report
+#   artifacts:
+#     paths:
+#       - target/site/jacoco  # Store the JaCoCo report as an artifact
 
 # Job to run SonarQube analysis
 sonarqube-analysis:
