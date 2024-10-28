@@ -5,34 +5,34 @@ stages:
   - report
   - sonar
 
-# Job to check Java and Maven versions
-check-java-maven:
-  stage: check
-  image: maven:3.8.3-openjdk-17
-  script:
-    - echo "Checking Java version..."
-    - java -version  # Check Java version
-    - echo "Checking Maven version..."
-    - mvn --version  # Check Maven version
+# # Job to check Java and Maven versions
+# check-java-maven:
+#   stage: check
+#   image: maven:3.8.3-openjdk-17
+#   script:
+#     - echo "Checking Java version..."
+#     - java -version  # Check Java version
+#     - echo "Checking Maven version..."
+#     - mvn --version  # Check Maven version
 
-# Job to run Maven build
-run-maven-build:
-  stage: build
-  image: maven:3.8.3-openjdk-17
-  script:
-    - echo "Running Maven build..."
-    - mvn compile  # Compile the project
+# # Job to run Maven build
+# run-maven-build:
+#   stage: build
+#   image: maven:3.8.3-openjdk-17
+#   script:
+#     - echo "Running Maven build..."
+#     - mvn compile  # Compile the project
 
-# Job to run Maven tests
-run-maven-tests:
-  stage: test
-  image: maven:3.8.3-openjdk-17
-  script:
-    - echo "Running Maven tests..."
-    - mvn clean test  # Run tests and clean up the previous builds
+# # Job to run Maven tests
+# run-maven-tests:
+#   stage: test
+#   image: maven:3.8.3-openjdk-17
+#   script:
+#     - echo "Running Maven tests..."
+#     - mvn clean test  # Run tests and clean up the previous builds
 
-# Job to generate JaCoCo coverage report
-generate-jacoco-report:
+# # Job to generate JaCoCo coverage report
+# generate-jacoco-report:
   stage: report
   image: maven:3.8.3-openjdk-17
   script:
@@ -47,6 +47,6 @@ sonarqube-analysis:
   image: maven:3.8.3-openjdk-17
   script:
     - echo "Running SonarQube analysis..."
-    - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b -X
+    - mvn  --batch-mode verify sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b -X
   only:
     - main
