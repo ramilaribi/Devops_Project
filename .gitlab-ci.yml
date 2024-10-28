@@ -42,15 +42,11 @@ generate-jacoco-report:
     paths:
       - target/site/jacoco  # Store the JaCoCo report as an artifact
 
-# Job to run SonarQube analysis
 sonarqube-analysis:
   stage: sonar
   image: maven:3.8.3-openjdk-17
   script:
     - echo "Running SonarQube analysis..."
-    - mvn sonar:sonar \
-      -Dsonar.projectKey=Devpos_Sonar\
-      -Dsonar.host.url=http://192.168.33.10:9000 \
-      -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b
+    - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b -X
   only:
     - main
