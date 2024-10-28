@@ -56,7 +56,7 @@ check-sonarqube-server:
 #     paths:
 #       - target/site/jacoco  # Store the JaCoCo report as an artifact
 
-# Job to run SonarQube analysis
+# :Job to run SonarQube analysis
 sonarqube-analysis:
   stage: sonar
   image: maven:3.8.3-openjdk-17
