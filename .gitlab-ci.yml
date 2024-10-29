@@ -40,9 +40,7 @@ stages:
 #     - mvn jacoco:report  # Generate JaCoCo coverage report
 #   artifacts:
 #     paths:
-# /      - target/site/jacoco  # Store the JaCoCo report as an artifact
-
-# SonarQube analysis job
+#      - target/site/jacoco  # Store the JaCoCo report as an artifact
 
 # SonarQube analysis job
 sonarqube-analysis:
