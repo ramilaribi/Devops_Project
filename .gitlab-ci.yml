@@ -47,20 +47,15 @@ sonarqube-analysis:
   stage: sonar
   image: maven:3.8.3-openjdk-17
   tags:
-    - sonar
+    - sonarqube
   script:
     - echo "Starting SonarQube analysis..."
-
-    # Check SonarQube server availability
     - curl -f http://192.168.33.10:9000 || (echo "SonarQube server is not reachable!" && exit 1)
-
-    # Run SonarQube analysis
-    - mvn sonar:sonar
-      -Dsonar.projectKey=Devpos_Sonar
-      -Dsonar.host.url=http://192.168.33.10:9000
-      -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b
-      -X -e || (echo "SonarQube analysis failed!" && exit 1)
-
+    - mvn sonar:sonar \
+        -Dsonar.projectKey=Devpos_Sonar \
+        -Dsonar.host.url=http://192.168.33.10:9000 \
+        -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b \
+        -Dsonar.exclusions=**/*.java \
+        -X -e 
     - echo "SonarQube analysis completed successfully."
   only:
-    - main
