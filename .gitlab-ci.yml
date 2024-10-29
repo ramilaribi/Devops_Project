@@ -6,14 +6,14 @@ stages:
   - sonar
 
 # # Job to check Java and Maven versions
-# check-java-maven:
-#   stage: check
-#   image: maven:3.8.3-openjdk-17
-#   script:
-#     - echo "Checking Java version..."
-#     - java -version  # Check Java version
-#     - echo "Checking Maven version..."
-#     - mvn --version  # Check Maven version
+check-java-maven:
+  stage: check
+  image: maven:3.8.3-openjdk-17
+  script:
+    - echo "Checking Java version..."
+    - java -version  # Check Java version
+    - echo "Checking Maven version..."
+    - mvn --version  # Check Maven version
 
 # # Job to run Maven build
 # run-maven-build:
