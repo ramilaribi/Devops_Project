@@ -40,7 +40,7 @@ stages:
 #     - mvn jacoco:report  # Generate JaCoCo coverage report
 #   artifacts:
 #     paths:
-#       - target/site/jacoco  # Store the JaCoCo report as an artifact
+# /      - target/site/jacoco  # Store the JaCoCo report as an artifact
 
 sonarqube-analysis:
   stage: sonar
