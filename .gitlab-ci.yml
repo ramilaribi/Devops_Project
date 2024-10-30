@@ -69,9 +69,9 @@ push-to-dockerhub:
     - echo "Logging into Docker Hub..."
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
     - echo "Building Docker image for backend..."
-    - docker build -t "$CI_REGISTRY_IMAGE/backendimage:latest" -f Dockerfile.gitlab .
+    - docker build -t "$CI_REGISTRY_IMAGE:latest" -f Dockerfile.gitlab .
     - echo "Pushing Docker image to Docker Hub..."
-    - docker push "$CI_REGISTRY_IMAGE/backendimage:latest"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
   dependencies:
     - run-maven-build  # Download artifacts from the build job
   only:
