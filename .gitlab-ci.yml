@@ -5,7 +5,7 @@ stages:
   - report
   - sonar
 
-# # Job to check Java and Maven versions
+# Job to check Java and Maven versions
 check-java-maven:
   stage: check
   image: maven:3.8.3-openjdk-17
@@ -40,20 +40,17 @@ generate-jacoco-report:
     - mvn jacoco:report  # Generate JaCoCo coverage report
   artifacts:
     paths:
-     - target/site/jacoco  # Store the JaCoCo report as an artifact
+      - target/site/jacoco  # Store the JaCoCo report as an artifact
 
-# SonarQube analysis job
 sonarqube-analysis:
   stage: sonar
-  image: maven:3.8.3-openjdk-17
   tags:
-    - sonar
+    - sonar  # our runner tag
   script:
     - echo "Starting SonarQube analysis..."
     - curl -f http://192.168.33.10:9000 || (echo "SonarQube server is not reachable!" && exit 1)
     - mvn clean compile
-    - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=sqa_d6925384b653b7dc2e4ad63ca0d48b20e408cd3b -Dsonar.java.binaries=target/classes -X -e || (echo "SonarQube analysis failed!" && exit 1)
+    - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN -Dsonar.java.binaries=target/classes -X -e || (echo "SonarQube analysis failed!" && exit 1)
     - echo "SonarQube analysis completed successfully."
-
-
   only:
+    - main
