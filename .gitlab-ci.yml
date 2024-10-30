@@ -76,3 +76,18 @@ push-to-dockerhub:
     - run-maven-build  # Download artifacts from the build job
   only:
     - main
+# Job to start Docker Compose services
+start-docker-compose:
+  stage: start_services
+  image: docker:latest
+  services:
+    - docker:dind  # Docker-in-Docker required for Compose commands
+  before_script:
+    - apk add --no-cache docker-compose  # Install Docker Compose on Alpine if needed
+  script:
+    - echo "Starting services with Docker Compose..."
+    - docker-compose -f docker-compose.yml up -d  # Start services in detached mode
+  dependencies:
+    - push-to-dockerhub  # Ensure that the Docker image is pushed before starting
+  only:
+    - main
