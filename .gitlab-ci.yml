@@ -59,20 +59,20 @@ generate-jacoco-report:
 #     - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN -Dsonar.java.binaries=target/classes -X -e || (echo "SonarQube analysis completed successfully✅!" && exit 1)
 
 # New Job to Create Docker Image Using Artifacts
-build-backend-image:
+# New Job to Build and Push Docker Image to Docker Hub
+push-to-dockerhub:
   stage: deploy
   image: docker:latest
   services:
     - docker:dind
   script:
+    - echo "Logging into Docker Hub..."
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
     - echo "Building Docker image for backend..."
-    - docker build -t backendimage -f Dockerfile.gitlab .  # Using lowercase for the image tag
-    - docker save backendimage -o backendimage.tar  # Save the Docker image as a .tar file
+    - docker build -t "$CI_REGISTRY_IMAGE:latest" -f Dockerfile.gitlab .
+    - echo "Pushing Docker image to Docker Hub..."
+    - docker push "$CI_REGISTRY_IMAGE:latest"
   dependencies:
     - run-maven-build  # Download artifacts from the build job
-  artifacts:
-    paths:
-      - backendimage.tar  # Save the Docker image as an artifact
-    expire_in: 2 week
   only:
     - main
