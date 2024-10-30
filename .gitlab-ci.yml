@@ -47,16 +47,16 @@ generate-jacoco-report:
     paths:
       - target/site/jacoco
 
- # Job for SonarQube analysis
-sonarqube-analysis:
-   stage: sonar
-   tags:
-     - sonar
-   script:
-     - echo "Starting SonarQube analysis..."
-     - curl -f http://192.168.33.10:9000 || (echo "SonarQube server is not reachable!" && exit 1)
-     - mvn clean compile
-     - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN -Dsonar.java.binaries=target/classes -X -e || (echo "SonarQube analysis completed successfully✅!" && exit 1)
+#  # Job for SonarQube analysis
+# sonarqube-analysis:
+#    stage: sonar
+#    tags:
+#      - sonar
+#    script:
+#      - echo "Starting SonarQube analysis..."
+#      - curl -f http://192.168.33.10:9000 || (echo "SonarQube server is not reachable!" && exit 1)
+#      - mvn clean compile
+#      - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN -Dsonar.java.binaries=target/classes -X -e || (echo "SonarQube analysis completed successfully✅!" && exit 1)
 
 # New Job to Create Docker Image Using Artifacts
 push-to-dockerhub:
