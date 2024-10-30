@@ -1,0 +1,11 @@
+# Use OpenJDK 17 as the base image
+FROM openjdk:17
+
+# Expose port 8082 for external access
+EXPOSE 8082
+
+# Copy the JAR file from the GitLab CI artifacts
+COPY target/voltix-*.jar devops_project.jar
+
+# Run the Spring Boot application
+ENTRYPOINT ["java", "-jar", "devops_project.jar"]
