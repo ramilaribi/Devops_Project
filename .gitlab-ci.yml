@@ -66,13 +66,13 @@ build-backend-image:
     - docker:dind
   script:
     - echo "Building Docker image for backend..."
-    - docker build -t backendImage -f Dockerfile.gitlab .  # Using Dockerfile.gitlab as specified
-    - docker save backendImage -o backendImage.tar  # Save the Docker image as a .tar file
+    - docker build -t backendimage -f Dockerfile.gitlab .  # Using lowercase for the image tag
+    - docker save backendimage -o backendimage.tar  # Save the Docker image as a .tar file
   dependencies:
     - run-maven-build  # Download artifacts from the build job
   artifacts:
     paths:
-      - backendImage.tar  # Save the Docker image as an artifact
+      - backendimage.tar  # Save the Docker image as an artifact
     expire_in: 2 week
   only:
     - main
