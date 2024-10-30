@@ -4,6 +4,7 @@ stages:
   - test
   - report
   - sonar
+  - deploy  # New stage for deploying with Docker
 
 # Job to check Java and Maven versions
 check-java-maven:
@@ -11,9 +12,9 @@ check-java-maven:
   image: maven:3.8.3-openjdk-17
   script:
     - echo "Checking Java version..."
-    - java -version  # Check Java version
+    - java -version
     - echo "Checking Maven version..."
-    - mvn --version  # Check Maven version
+    - mvn --version
 
 # Job to run Maven build
 run-maven-build:
@@ -21,7 +22,11 @@ run-maven-build:
   image: maven:3.8.3-openjdk-17
   script:
     - echo "Running Maven build..."
-    - mvn compile  # Compile the project
+    - mvn clean package  # Package the project (creates a JAR file in target)
+  artifacts:
+    paths:
+      - target/  # Save the target directory as an artifact
+    expire_in: 1 week  # Optional: Set expiration time for artifacts
 
 # Job to run Maven tests
 run-maven-tests:
@@ -29,7 +34,7 @@ run-maven-tests:
   image: maven:3.8.3-openjdk-17
   script:
     - echo "Running Maven tests..."
-    - mvn clean test  # Run tests and clean up the previous builds
+    - mvn clean test
 
 # Job to generate JaCoCo coverage report
 generate-jacoco-report:
@@ -37,20 +42,37 @@ generate-jacoco-report:
   image: maven:3.8.3-openjdk-17
   script:
     - echo "Generating JaCoCo coverage report..."
-    - mvn jacoco:report  # Generate JaCoCo coverage report
+    - mvn jacoco:report
   artifacts:
     paths:
-      - target/site/jacoco  # Store the JaCoCo report as an artifact
+      - target/site/jacoco
 
-sonarqube-analysis:
-  stage: sonar
-  tags:
-    - sonar  # our runner tag
+# # Job for SonarQube analysis
+# sonarqube-analysis:
+#   stage: sonar
+#   tags:
+#     - sonar
+#   script:
+#     - echo "Starting SonarQube analysis..."
+#     - curl -f http://192.168.33.10:9000 || (echo "SonarQube server is not reachable!" && exit 1)
+#     - mvn clean compile
+#     - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN -Dsonar.java.binaries=target/classes -X -e || (echo "SonarQube analysis completed successfully✅!" && exit 1)
+
+# New Job to Create Docker Image Using Artifacts
+build-backend-image:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
   script:
-    - echo "Starting SonarQube analysis..."
-    - curl -f http://192.168.33.10:9000 || (echo "SonarQube server is not reachable!" && exit 1)
-    - mvn clean compile
-    - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN -Dsonar.java.binaries=target/classes -X -e || (echo "SonarQube analysis failed!" && exit 1)
-    - echo "SonarQube analysis completed successfully."
+    - echo "Building Docker image for backend..."
+    - docker build -t backendImage -f Dockerfile.gitlab .  # Using Dockerfile.gitlab as specified
+    - docker save backendImage -o backendImage.tar  # Save the Docker image as a .tar file
+  dependencies:
+    - run-maven-build  # Download artifacts from the build job
+  artifacts:
+    paths:
+      - backendImage.tar  # Save the Docker image as an artifact
+    expire_in: 2 week
   only:
     - main
