@@ -1,6 +1,7 @@
 services:
   backend:
-    image: ramilaribi/devops_projet
+    image: ramilaribi/backendimage:latest
+    # image: ramilaribi/devops_projet
     container_name: voltix-backend
     ports:
       - "8086:8086"
