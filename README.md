@@ -1,7 +1,7 @@
 <h1 align="center">🚀 DevOps CI/CD Project</h1>
 
 <p align="center">
-    <img src="cicd.gif" alt="CI/CD Animation" width="1000" height="400" />
+    <img src="cicd.png" alt="CI/CD Animation" width="1000" height="400" />
 </p>
 
 ## 📖 Overview
