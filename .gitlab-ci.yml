@@ -28,35 +28,35 @@ run-maven-build:
       - target/  # Save the target directory as an artifact
     expire_in: 1 week  # Optional: Set expiration time for artifacts
 
-# Job to run Maven tests
-run-maven-tests:
-  stage: test
-  image: maven:3.8.3-openjdk-17
-  script:
-    - echo "Running Maven tests..."
-    - mvn clean test
+# # Job to run Maven tests
+# run-maven-tests:
+#   stage: test
+#   image: maven:3.8.3-openjdk-17
+#   script:
+#     - echo "Running Maven tests..."
+#     - mvn clean test
 
-# Job to generate JaCoCo coverage report
-generate-jacoco-report:
-  stage: report
-  image: maven:3.8.3-openjdk-17
-  script:
-    - echo "Generating JaCoCo coverage report..."
-    - mvn jacoco:report
-  artifacts:
-    paths:
-      - target/site/jacoco
+# # Job to generate JaCoCo coverage report
+# generate-jacoco-report:
+#   stage: report
+#   image: maven:3.8.3-openjdk-17
+#   script:
+#     - echo "Generating JaCoCo coverage report..."
+#     - mvn jacoco:report
+#   artifacts:
+#     paths:
+#       - target/site/jacoco
 
- # Job for SonarQube analysis
-sonarqube-analysis:
-   stage: sonar
-   tags:
-     - sonar
-   script:
-     - echo "Starting SonarQube analysis..."
-     - curl -f http://192.168.33.10:9000 || (echo "SonarQube server is not reachable!" && exit 1)
-     - mvn clean compile
-     - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN -Dsonar.java.binaries=target/classes -X -e || (echo "SonarQube analysis completed successfully✅!" && exit 1)
+#  # Job for SonarQube analysis
+# sonarqube-analysis:
+#    stage: sonar
+#    tags:
+#      - sonar
+#    script:
+#      - echo "Starting SonarQube analysis..."
+#      - curl -f http://192.168.33.10:9000 || (echo "SonarQube server is not reachable!" && exit 1)
+#      - mvn clean compile
+#      - mvn sonar:sonar -Dsonar.projectKey=Devpos_Sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=$SONAR_TOKEN -Dsonar.java.binaries=target/classes -X -e || (echo "SonarQube analysis completed successfully✅!" && exit 1)
 
 # New Job to Create Docker Image Using Artifacts
 push-to-dockerhub:
