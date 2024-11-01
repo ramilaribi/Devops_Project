@@ -79,6 +79,8 @@ push-to-dockerhub:
 start-docker-compose:
   stage: start_services
   image: docker:latest
+  tags:
+    - ec2-runner
   services:
     - docker:dind  # Docker-in-Docker required for Compose commands
   before_script:
