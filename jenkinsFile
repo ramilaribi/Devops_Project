@@ -19,7 +19,7 @@ pipeline {
                 sh "mvn -version"
             }
         }
-        stage("Testing JDK") {
+     /*   stage("Testing JDK") {
             steps {
                 sh "java -version"
             }
@@ -79,7 +79,7 @@ pipeline {
                      echo "Waiting for services to be ready..."
                      sleep(180)
                  }
-             }
+             }*/
          }
 
         stage('MVN SONARQUBE') {
