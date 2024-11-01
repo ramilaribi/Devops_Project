@@ -79,7 +79,7 @@ pipeline {
                      echo "Waiting for services to be ready..."
                      sleep(180)
                  }
-             }*/
+
          }
 
         stage('MVN SONARQUBE') {
@@ -154,7 +154,7 @@ pipeline {
                     sh 'docker compose ps'
                 }
             }
-        }
+        }*/
     }
     post {
         always {
