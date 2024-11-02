@@ -87,15 +87,15 @@ stop-docker-compose:
   only:
     - main
 
-# /Job to start Docker Compose services with data persistence
-start-docker-compose:
-  stage: start_services
-  tags:
-    - ec2-runner
-  script:
-    - echo "Starting services with Docker Compose..."
-    - docker-compose -f docker-compose.yml up -d
-  dependencies:
-    - push-to-dockerhub
-  only:
-    - main
+# # /Job to start Docker Compose services with data persistence
+# start-docker-compose:
+#   stage: start_services
+#   tags:
+#     - ec2-runner
+#   script:
+#     - echo "Starting services with Docker Compose..."
+#     - docker-compose -f docker-compose.yml up -d
+#   dependencies:
+#     - push-to-dockerhub
+#   only:
+#     - main
