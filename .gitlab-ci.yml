@@ -78,13 +78,8 @@ push-to-dockerhub:
 # Job to start Docker Compose services
 start-docker-compose:
   stage: start_services
-  image: docker:latest
   tags:
     - ec2-runner
-  services:
-    - docker:dind  # Docker-in-Docker required for Compose commands
-  before_script:
-    - apk add --no-cache docker-compose  # Install Docker Compose on Alpine if needed
   script:
     - echo "Starting services with Docker Compose..."
     - docker-compose -f docker-compose.yml up -d  # Start services in detached mode
