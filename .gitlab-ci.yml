@@ -4,7 +4,8 @@ stages:
   - test
   - report
   - sonar
-  - deploy  # New stage for deploying with Docker
+  - deploy
+  - stop_services
   - start_services
 # Job to check Java and Maven versions
 check-java-maven:
