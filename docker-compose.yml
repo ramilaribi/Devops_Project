@@ -1,7 +1,6 @@
 services:
   backend:
     image: ramilaribi/backendimage:latest
-    # image: ramilaribi/devops_projet
     container_name: voltix-backend
     ports:
       - "8086:8086"
@@ -29,6 +28,8 @@ services:
       MYSQL_DATABASE: voltixxx
     ports:
       - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql  # Add named volume for MySQL data
     networks:
       - voltix-network
     restart: unless-stopped
@@ -43,6 +44,8 @@ services:
     container_name: voltix-mongo
     ports:
       - "27017:27017"
+    volumes:
+      - mongo-data:/data/db  # Add named volume for MongoDB data
     networks:
       - voltix-network
     restart: unless-stopped
@@ -52,6 +55,25 @@ services:
       timeout: 15s
       retries: 5
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: voltix-phpmyadmin
+    ports:
+      - "8087:80"  # Expose phpMyAdmin on port 8087
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - voltix-network
+    restart: unless-stopped
+
 networks:
   voltix-network:
     driver: bridge
+
+volumes:
+  mysql-data:  # Define named volume for MySQL data
+  mongo-data:  # Define named volume for MongoDB data
