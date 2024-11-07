@@ -1,6 +1,7 @@
 services:
   backend:
-    image: ramilaribi/backendimage:latest
+   # image: ramilaribi/backendimage:latest
+    image: ramilaribi/imagerami:latest
     container_name: voltix-backend
     ports:
       - "8086:8086"
