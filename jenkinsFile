@@ -155,29 +155,36 @@ pipeline {
                 }
             }
         }*/
-        stage('Deploy to EC2') {
-            steps {
-                script {
-                    sshagent(['aws-ec2-ssh-credentials']) {
-                        sh '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@3.21.185.71 << 'EOF'
-                        # Pull the latest changes from the Git repository
-                        git -C /home/ubuntu/Devops_Project pull origin main || git clone https://github.com/ramilaribi/Devops_Project.git /home/ubuntu/Devops_Project
+       stage('Deploy to EC2') {
+           steps {
+               script {
+                   echo "Starting deployment to EC2 instance..."
+                   sshagent(['aws-ec2-ssh-credentials']) {
+                       sh '''
+                       echo "Connecting to EC2 instance via SSH..."
+                       ssh -o StrictHostKeyChecking=no ubuntu@3.21.185.71 << 'EOF'
 
-                        # Navigate to the project directory
-                        cd /home/ubuntu/Devops_Project
+                       echo "Pulling latest changes from Git repository..."
+                       # Pull the latest changes from the Git repository
+                       git -C /home/ubuntu/Devops_Project pull origin main || git clone https://github.com/ramilaribi/Devops_Project.git /home/ubuntu/Devops_Project
 
-                        # Run Docker Compose to deploy updated image
-                        docker compose down
-                        docker compose up -d --build
-                        EOF
-                        '''
-                    }
-                }
-            }
-        }
+                       echo "Navigating to the project directory..."
+                       # Navigate to the project directory
+                       cd /home/ubuntu/Devops_Project
 
-    }
+                       echo "Stopping and redeploying containers with Docker Compose..."
+                       # Run Docker Compose to deploy updated image
+                       docker compose down
+                       docker compose up -d --build
+
+                       echo "Deployment completed on EC2 instance."
+                       EOF
+                       '''
+                   }
+                   echo "Deployment to EC2 instance finished."
+               }
+           }
+       }
     post {
         always {
             echo 'Cleaning up...'
