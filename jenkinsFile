@@ -44,7 +44,7 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         }
-     /*    stage('Check and Start Nexus and SonarQube') {
+       stage('Check and Start Nexus and SonarQube') {
              steps {
                  script {
                      def nexusContainer = "nexus_auto"
@@ -142,6 +142,8 @@ pipeline {
                 sh 'docker compose version'
             }
         }
+
+        #this is setup for running On VM
         stage('Docker Compose') {
             steps {
                 sh 'docker compose down'
@@ -154,84 +156,67 @@ pipeline {
                     sh 'docker compose ps'
                 }
             }
-        }*/
-       stage('Deploy to EC2') {
-           steps {
-               script {
-                   echo "Starting deployment to EC2 instance..."
-                   sshagent(['aws-ec2-ssh-credentials']) {
-                       sh '''
-                       echo "Connecting to EC2 instance via SSH..."
-                       ssh -o StrictHostKeyChecking=no ubuntu@3.21.185.71 << 'EOF'
-
-                       echo "Pulling latest changes from Git repository..."
-                       # Pull the latest changes from the Git repository
-                       git -C /home/ubuntu/Devops_Project pull origin main || git clone https://github.com/ramilaribi/Devops_Project.git /home/ubuntu/Devops_Project
-
-                       echo "Navigating to the project directory..."
-                       # Navigate to the project directory
-                       cd /home/ubuntu/Devops_Project
-
-                       echo "Stopping and redeploying containers with Docker Compose..."
-                       # Run Docker Compose to deploy updated image
-                       docker compose down
-                       docker compose up -d --build
-
-                       echo "Deployment completed on EC2 instance."
-                       EOF
-                       '''
-                   }
-                   echo "Deployment to EC2 instance finished."
-               }
-           }
-       }
-    post {
-        always {
-            echo 'Cleaning up...'
-            sh 'docker stop nexus_auto || true'
-            sh 'docker stop sonarqube_auto || true'
-            sh 'docker stop sonarqube-db-auto || true'
-            sh 'docker compose down || true'
         }
-        success {
-            withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
-                emailext(
-                    to: "${EMAIL_USERNAME}",
-                    subject: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: """
-Hello,
+              stage('Deploy to EC2') {
+                  steps {
+                      script {
+                          echo "Starting deployment to EC2 instance..."
+                          sshagent(['aws-ec2-ssh-credentials']) {
+                              sh '''
+                              echo "Connecting to EC2 instance via SSH... 🔧"
 
-The build for job '${env.JOB_NAME}' (Build #${env.BUILD_NUMBER}) has completed successfully.
+                              ssh -tt -o StrictHostKeyChecking=no ubuntu@18.189.30.25 << 'EOF'
+                              echo "Pulling latest changes from Git repository...〽️"
+                              git -C /home/ubuntu/Devops_Project pull origin main || git clone https://github.com/ramilaribi/Devops_Project.git /home/ubuntu/Devops_Project
 
-You can check the console output for more details at: [Build Log](${env.BUILD_URL})
+                              echo "Navigating to the project directory..."
+                              cd /home/ubuntu/Devops_Project
 
-Thank you for your attention!
+                              echo "Stopping and redeploying containers with Docker Compose... 🔘"
+                              docker-compose down
+                              docker-compose up -d --build
 
-Best regards,
-Your Jenkins CI/CD
-"""
-                )
-            }
-        }
-        failure {
-            withCredentials([usernamePassword(credentialsId: 'email-credentials', passwordVariable: 'EMAIL_PASSWORD', usernameVariable: 'EMAIL_USERNAME')]) {
-                emailext(
-                    to: "${EMAIL_USERNAME}",
-                    subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    body: """
-Hello,
-
-The build for job '${env.JOB_NAME}' (Build #${env.BUILD_NUMBER}) has failed.
-
-You can check the console output for more details at: [Build Log](${env.BUILD_URL})
-
-Please investigate the issue.
-
-Best regards,
-Your Jenkins CI/CD
-"""
-                )
-            }
-        }
+                              echo "Deployment completed on EC2 instance.✅"
+                              exit
+                              EOF
+                              '''
+                          }
+                          echo "Deployment to EC2 instance finished."
+                      }
+                  }
+              }
+       post {
+    always {
+        echo 'Cleaning up...'
+        sh 'docker stop nexus_auto || true'
+        sh 'docker stop sonarqube_auto || true'
+        sh 'docker stop sonarqube-db-auto || true'
     }
+    success {
+        mail to: 'laribi.rami@esprit.tn',
+            subject: "✅ Build Successful",
+            mimeType: 'text/html', // Ensures HTML rendering
+            body: """
+                <h2 style="color: green;">🎉 Build Successful 🎉</h2>
+                <p>Hello,</p>
+                <p>The build for your job has completed successfully!</p>
+                <p>✨ <a href="http://192.168.33.10:8080/job/testMail/13/">View Console Output</a></p>
+                <p>Thank you for your attention!</p>
+                <p>Best regards,<br> Jenkins CI/CD 🤖</p>
+            """
+    }
+    failure {
+        mail to: 'laribi.rami@esprit.tn',
+            subject: "❌ Build Failed",
+            mimeType: 'text/html', // Ensures HTML rendering
+            body: """
+                <h2 style="color: red;">🚨 Build Failed 🚨</h2>
+                <p>Hello,</p>
+                <p>The build for your job has unfortunately failed.</p>
+                <p>🔍 <a href="http://192.168.33.10:8080/job/testMail/13/">View Console Output</a></p>
+                <p>Thank you for your attention!</p>
+                <p>Best regards,<br> Jenkins CI/CD 🤖</p>
+            """
+    }
+}
 }
