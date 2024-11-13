@@ -69,6 +69,9 @@ services:
         condition: service_healthy
     networks:
       - voltix-network
+    volumes:
+      - ./apache.conf:/etc/apache2/conf-available/servername.conf  # Mount apache.conf
+    command: /bin/bash -c "ln -s /etc/apache2/conf-available/servername.conf /etc/apache2/conf-enabled/servername.conf && apache2-foreground"
     restart: unless-stopped
 
 networks:
