@@ -87,7 +87,7 @@ stop-docker-compose:
   only:
     - main
 
-# Job to start Docker Compose services with data persistence
+# /Job to start Docker Compose services with data persistence
 start-docker-compose:
   stage: start_services
   tags:
