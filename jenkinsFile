@@ -10,11 +10,10 @@ def startContainerIfExists(containerName) {
     }
 }
 
-
 pipeline {
     agent any
-   stages {
-       stage("Testing Maven") {
+    stages {
+        stage("Testing Maven") {
             steps {
                 sh "mvn -version"
             }
@@ -44,43 +43,42 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         }
-       stage('Check and Start Nexus and SonarQube') {
-             steps {
-                 script {
-                     def nexusContainer = "nexus_auto"
-                     def sonarqubeContainer = "sonarqube_auto"
-                     def sonarqubeDbContainer = "sonarqube-db-auto"
+        stage('Check and Start Nexus and SonarQube') {
+            steps {
+                script {
+                    def nexusContainer = "nexus_auto"
+                    def sonarqubeContainer = "sonarqube_auto"
+                    def sonarqubeDbContainer = "sonarqube-db-auto"
+                    def containersNeedCreating = false
 
-                     def containersNeedCreating = false
+                    // Check Nexus container
+                    if (!startContainerIfExists(nexusContainer)) {
+                        containersNeedCreating = true
+                    }
 
-                     // Check Nexus container
-                     if (!startContainerIfExists(nexusContainer)) {
-                         containersNeedCreating = true
-                     }
+                    // Check SonarQube container
+                    if (!startContainerIfExists(sonarqubeContainer)) {
+                        containersNeedCreating = true
+                    }
 
-                     // Check SonarQube container
-                     if (!startContainerIfExists(sonarqubeContainer)) {
-                         containersNeedCreating = true
-                     }
+                    // Check SonarQube DB container
+                    if (!startContainerIfExists(sonarqubeDbContainer)) {
+                        containersNeedCreating = true
+                    }
 
-                     // Check SonarQube DB container
-                     if (!startContainerIfExists(sonarqubeDbContainer)) {
-                         containersNeedCreating = true
-                     }
-
-                     // If any container is missing, create and start all using Docker Compose
-                     if (containersNeedCreating) {
-                         echo "Creating and starting containers using Docker Compose..."
-                         sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
-                         echo "Containers created and started."
-                     } else {
-                         echo "All containers are already running."
-                     }
-                     echo "Waiting for services to be ready..."
-                     sleep(180)
-                 }
-             }
-         }
+                    // If any container is missing, create and start all using Docker Compose
+                    if (containersNeedCreating) {
+                        echo "Creating and starting containers using Docker Compose..."
+                        sh 'docker-compose -f docker-compose-nexus-sonarqube.yml up -d --build'
+                        echo "Containers created and started."
+                    } else {
+                        echo "All containers are already running."
+                    }
+                    echo "Waiting for services to be ready..."
+                    sleep(180)
+                }
+            }
+        }
 
         stage('MVN SONARQUBE') {
             steps {
@@ -115,17 +113,14 @@ pipeline {
             }
         }
         stage('Build Docker Image') {
-               steps {
-                   script {
-                       def customImageName = "imagerami"
-                       // Extract the version from the pom.xml
-                       def version = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
-
-                       // Build the Docker image, passing the version
-                       sh "docker build --build-arg VERSION=${version} -t $customImageName ."
-                   }
-               }
-           }
+            steps {
+                script {
+                    def customImageName = "imagerami"
+                    def version = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+                    sh "docker build --build-arg VERSION=${version} -t $customImageName ."
+                }
+            }
+        }
         stage('Push Docker Image') {
             steps {
                 script {
@@ -143,80 +138,79 @@ pipeline {
             }
         }
 
-       /* #this is setup for running On VM
-        stage('Docker Compose') {
-            steps {
-                sh 'docker compose down'
-                sh 'docker compose up -d --build'
-            }
-        }
-        stage('Check Docker Compose') {
+        // Docker Compose setup for running on VM (commented out)
+        // stage('Docker Compose') {
+        //     steps {
+        //         sh 'docker compose down'
+        //         sh 'docker compose up -d --build'
+        //     }
+        // }
+        // stage('Check Docker Compose') {
+        //     steps {
+        //         script {
+        //             sh 'docker compose ps'
+        //         }
+        //     }
+        // }
+
+        stage('Deploy to EC2') {
             steps {
                 script {
-                    sh 'docker compose ps'
+                    echo "Starting deployment to EC2 instance..."
+                    sshagent(['aws-ec2-ssh-credentials']) {
+                        sh '''
+                        echo "Connecting to EC2 instance via SSH... 🔧"
+                        ssh -tt -o StrictHostKeyChecking=no ubuntu@18.189.30.25 << 'EOF'
+                        echo "Pulling latest changes from Git repository...〽️"
+                        git -C /home/ubuntu/Devops_Project pull origin main || git clone https://github.com/ramilaribi/Devops_Project.git /home/ubuntu/Devops_Project
+                        echo "Navigating to the project directory..."
+                        cd /home/ubuntu/Devops_Project
+                        echo "Stopping and redeploying containers with Docker Compose... 🔘"
+                        docker-compose down
+                        docker-compose up -d --build
+                        echo "Deployment completed on EC2 instance.✅"
+                        exit
+                        EOF
+                        '''
+                    }
+                    echo "Deployment to EC2 instance finished."
                 }
             }
-        }*/
-              stage('Deploy to EC2') {
-                  steps {
-                      script {
-                          echo "Starting deployment to EC2 instance..."
-                          sshagent(['aws-ec2-ssh-credentials']) {
-                              sh '''
-                              echo "Connecting to EC2 instance via SSH... 🔧"
+        }
+    }
 
-                              ssh -tt -o StrictHostKeyChecking=no ubuntu@18.189.30.25 << 'EOF'
-                              echo "Pulling latest changes from Git repository...〽️"
-                              git -C /home/ubuntu/Devops_Project pull origin main || git clone https://github.com/ramilaribi/Devops_Project.git /home/ubuntu/Devops_Project
-
-                              echo "Navigating to the project directory..."
-                              cd /home/ubuntu/Devops_Project
-
-                              echo "Stopping and redeploying containers with Docker Compose... 🔘"
-                              docker-compose down
-                              docker-compose up -d --build
-
-                              echo "Deployment completed on EC2 instance.✅"
-                              exit
-                              EOF
-                              '''
-                          }
-                          echo "Deployment to EC2 instance finished."
-                      }
-                  }
-              }
     post {
-    always {
-        echo 'Cleaning up...'
-        sh 'docker stop nexus_auto || true'
-        sh 'docker stop sonarqube_auto || true'
-        sh 'docker stop sonarqube-db-auto || true'
+        always {
+            echo 'Cleaning up...'
+            sh 'docker stop nexus_auto || true'
+            sh 'docker stop sonarqube_auto || true'
+            sh 'docker stop sonarqube-db-auto || true'
+        }
+        success {
+            mail to: 'laribi.rami@esprit.tn',
+                subject: "✅ Build Successful",
+                mimeType: 'text/html', // Ensures HTML rendering
+                body: """
+                    <h2 style="color: green;">🎉 Build Successful 🎉</h2>
+                    <p>Hello,</p>
+                    <p>The build for your job has completed successfully!</p>
+                    <p>✨ <a href="http://192.168.33.10:8080/job/testMail/13/">View Console Output</a></p>
+                    <p>Thank you for your attention!</p>
+                    <p>Best regards,<br> Jenkins CI/CD 🤖</p>
+                """
+        }
+        failure {
+            mail to: 'laribi.rami@esprit.tn',
+                subject: "❌ Build Failed",
+                mimeType: 'text/html', // Ensures HTML rendering
+                body: """
+                    <h2 style="color: red;">🚨 Build Failed 🚨</h2>
+                    <p>Hello,</p>
+                    <p>The build for your job has unfortunately failed.</p>
+                    <p>🔍 <a href="http://192.168.33.10:8080/job/testMail/13/">View Console Output</a></p>
+                    <p>Thank you for your attention!</p>
+                    <p>Best regards,<br> Jenkins CI/CD 🤖</p>
+                """
+        }
     }
-    success {
-        mail to: 'laribi.rami@esprit.tn',
-            subject: "✅ Build Successful",
-            mimeType: 'text/html', // Ensures HTML rendering
-            body: """
-                <h2 style="color: green;">🎉 Build Successful 🎉</h2>
-                <p>Hello,</p>
-                <p>The build for your job has completed successfully!</p>
-                <p>✨ <a href="http://192.168.33.10:8080/job/testMail/13/">View Console Output</a></p>
-                <p>Thank you for your attention!</p>
-                <p>Best regards,<br> Jenkins CI/CD 🤖</p>
-            """
-    }
-    failure {
-        mail to: 'laribi.rami@esprit.tn',
-            subject: "❌ Build Failed",
-            mimeType: 'text/html', // Ensures HTML rendering
-            body: """
-                <h2 style="color: red;">🚨 Build Failed 🚨</h2>
-                <p>Hello,</p>
-                <p>The build for your job has unfortunately failed.</p>
-                <p>🔍 <a href="http://192.168.33.10:8080/job/testMail/13/">View Console Output</a></p>
-                <p>Thank you for your attention!</p>
-                <p>Best regards,<br> Jenkins CI/CD 🤖</p>
-            """
-    }
-}
 }
