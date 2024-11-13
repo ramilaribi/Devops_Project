@@ -31,7 +31,7 @@ public class SecurityConfig {
     @Lazy
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean
+   /* @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         logger.info("Configuring security filter chain...");
 
@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/user/**","/equipments/**","/error","/device/**","/areas/**","/swagger-ui/**","/v3/api-docs/**","/swagger-resources/**","/webjars/**","/uploads/**","/energy/**")
+                                .requestMatchers("/Voltix/login","/user/**","/equipments/**","/error","/device/**","/areas/**","/swagger-ui/**","/v3/api-docs/**","/swagger-resources/**","/webjars/**","/uploads/**","/energy/**")
                                 .permitAll()
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
@@ -58,7 +58,17 @@ public class SecurityConfig {
 
         return http.build();
     }
+*/
+   @Bean
+   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+       http
+               .csrf(csrf -> csrf.disable())
+               .authorizeRequests(authorizeRequests ->
+                       authorizeRequests.anyRequest().permitAll()
+               );
 
+       return http.build();
+   }
     @Bean
     public UserDetailsService userDetailsService() {
         return new InMemoryUserDetailsManager(
