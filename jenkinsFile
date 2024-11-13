@@ -160,7 +160,7 @@ pipeline {
                     sshagent(['aws-ec2-ssh-credentials']) {
                         sh '''
                         echo "Connecting to EC2 instance via SSH... 🔧"
-                        ssh -tt -o StrictHostKeyChecking=no ubuntu@18.220.2.233 << 'EOF'
+                        ssh -tt -o StrictHostKeyChecking=no ubuntu@18.116.31.214 << 'EOF'
                         echo "Pulling latest changes from Git repository...〽️"
                         git -C /home/ubuntu/Devops_Project pull origin main || git clone https://github.com/ramilaribi/Devops_Project.git /home/ubuntu/Devops_Project
                         echo "Navigating to the project directory..."
